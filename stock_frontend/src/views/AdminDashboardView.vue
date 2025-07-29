@@ -8,6 +8,17 @@ import CategoryForm from '@/components/admin/CategoryForm.vue'
 import ProductForm from '@/components/admin/ProductForm.vue'
 import ErrorAlert from '@/components/ui/ErrorAlert.vue'
 
+/**
+ * API endpoint base for category and product data.
+ * Sourced from the environment variable VUE_APP_BACKEND_BASE_URL
+ */
+const API_BASE = import.meta.env.VUE_APP_BACKEND_BASE_URL as string;
+if (!API_BASE) {
+  // Development warning for missing env
+  // eslint-disable-next-line no-console
+  console.warn('VUE_APP_BACKEND_BASE_URL not set! Check your .env configuration.');
+}
+
 const categories = ref<Category[]>([])
 const products = ref<Product[]>([])
 const loading = ref(false)
@@ -47,8 +58,8 @@ async function performRefillMockData() {
     await adminApi.refillMockData()
     // Immediate data refresh after successful refill
     const [categoriesData, productsData] = await Promise.all([
-      fetch('https://vscode-internal-6-beta.beta01.cloud.kavia.ai:3001/categories').then(r => r.json()),
-      fetch('https://vscode-internal-6-beta.beta01.cloud.kavia.ai:3001/products').then(r => r.json())
+      fetch(`${API_BASE}/categories`).then(r => r.json()),
+      fetch(`${API_BASE}/products`).then(r => r.json())
     ])
     categories.value = categoriesData
     products.value = productsData
@@ -81,8 +92,8 @@ async function performClearAllData() {
     products.value = []
     // Then refresh from server to ensure consistency
     const [categoriesData, productsData] = await Promise.all([
-      fetch('https://vscode-internal-6-beta.beta01.cloud.kavia.ai:3001/categories').then(r => r.json()),
-      fetch('https://vscode-internal-6-beta.beta01.cloud.kavia.ai:3001/products').then(r => r.json())
+      fetch(`${API_BASE}/categories`).then(r => r.json()),
+      fetch(`${API_BASE}/products`).then(r => r.json())
     ])
     categories.value = categoriesData
     products.value = productsData
@@ -100,8 +111,8 @@ async function loadData() {
   error.value = ''
   try {
     const [categoriesData, productsData] = await Promise.all([
-      fetch('https://vscode-internal-6-beta.beta01.cloud.kavia.ai:3001/categories').then(r => r.json()),
-      fetch('https://vscode-internal-6-beta.beta01.cloud.kavia.ai:3001/products').then(r => r.json())
+      fetch(`${API_BASE}/categories`).then(r => r.json()),
+      fetch(`${API_BASE}/products`).then(r => r.json())
     ])
     categories.value = categoriesData
     products.value = productsData

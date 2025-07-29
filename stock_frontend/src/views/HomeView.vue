@@ -28,9 +28,14 @@ interface Product {
 
 /**
  * API endpoint base for category and product data.
- * @constant
+ * Sourced from the environment variable VUE_APP_BACKEND_BASE_URL
  */
-const API_BASE = 'https://vscode-internal-6-beta.beta01.cloud.kavia.ai:3001';
+const API_BASE = import.meta.env.VUE_APP_BACKEND_BASE_URL as string;
+if (!API_BASE) {
+  // Development warning for missing env
+  // eslint-disable-next-line no-console
+  console.warn('VUE_APP_BACKEND_BASE_URL not set! Check your .env configuration.');
+}
 
 // ----- Reactive State -----
 const categories = ref<Category[]>([]);

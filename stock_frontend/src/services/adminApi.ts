@@ -1,6 +1,15 @@
 import { useAuthStore } from '../stores/auth'
 
-const API_BASE = 'https://vscode-internal-6-beta.beta01.cloud.kavia.ai:3001'
+/**
+ * API base URL is sourced from environment variable for flexibility.
+ * Ensure VUE_APP_BACKEND_BASE_URL is defined in your .env file.
+ */
+const API_BASE = import.meta.env.VUE_APP_BACKEND_BASE_URL as string
+if (!API_BASE) {
+  // For dev assurance, log if not set
+  // eslint-disable-next-line no-console
+  console.warn('VUE_APP_BACKEND_BASE_URL not set! Check your .env configuration.')
+}
 
 /**
  * Category type definition

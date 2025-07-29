@@ -31,7 +31,13 @@ export const useAuthStore = defineStore('auth', () => {
   async function login(username: string, password: string): Promise<boolean> {
     loginError.value = '';
     try {
-      const resp = await fetch('https://vscode-internal-6-beta.beta01.cloud.kavia.ai:3001/login', {
+      // Use environment variable for backend login endpoint
+      const API_BASE = import.meta.env.VUE_APP_BACKEND_BASE_URL as string;
+      if (!API_BASE) {
+        // eslint-disable-next-line no-console
+        console.warn('VUE_APP_BACKEND_BASE_URL not set! Login endpoint may not work.');
+      }
+      const resp = await fetch(`${API_BASE}/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
