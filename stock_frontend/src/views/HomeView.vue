@@ -4,6 +4,7 @@ import CategorySidebar from '../components/CategorySidebar.vue';
 import CategoryBlock from '../components/CategoryBlock.vue';
 import type { ComponentPublicInstance } from 'vue';
 
+
 // PUBLIC_INTERFACE
 
 /**
