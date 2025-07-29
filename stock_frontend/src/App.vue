@@ -1,34 +1,64 @@
 <script setup lang="ts">
-import { RouterView, useRouter } from 'vue-router'
+import { RouterView, useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from './stores/auth'
 import { computed } from 'vue'
 
 const auth = useAuthStore()
 const router = useRouter()
+const route = useRoute()
 const isAdmin = computed(() => auth.isAdmin)
+
+/**
+ * Determine if we are currently showing the admin dashboard route.
+ */
+const isOnAdminDashboard = computed(() => route.name === 'admin-dashboard')
+
+/**
+ * Button label and navigation for admin, depending on route.
+ * - On main/public view: show "Manage Stock", nav to dashboard.
+ * - On admin dashboard: show "Back to Public View", nav to home.
+ */
+const adminHeaderButton = computed(() => {
+  if (!isAdmin.value) return null
+  return isOnAdminDashboard.value
+    ? { label: '← Back to Public View', action: goToPublic }
+    : { label: '⚙️ Manage Stock', action: goToDashboard }
+})
 
 function handleLogout() {
   auth.logout()
   router.push({ name: 'home' })
 }
-
 function goToLogin() {
   router.push({ name: 'admin-login' })
+}
+function goToDashboard() {
+  if (!isOnAdminDashboard.value) router.push({ name: 'admin-dashboard' })
+}
+function goToPublic() {
+  if (isOnAdminDashboard.value) router.push({ name: 'home' })
 }
 </script>
 
 <template>
   <header class="app-header" role="banner">
     <div class="header-flex">
-      <!-- Left: Manage Stock (admin only) -->
+      <!-- Left: Admin Nav Button (admin only) -->
       <div class="header-left">
         <button
-          v-if="isAdmin"
-          @click="()=>router.push({name:'admin-dashboard'})"
+          v-if="adminHeaderButton"
           class="admin-btn manage-stock-btn"
+          style="min-width:125px;"
+          @click="adminHeaderButton.action"
         >
-          ⚙️ Manage Stock
+          {{ adminHeaderButton.label }}
         </button>
+        <!-- Always render (even if invisible) a "placeholder" of same width to keep title perfectly centered. -->
+        <span
+          v-else
+          class="header-left-placeholder"
+          aria-hidden="true"
+        ></span>
       </div>
       <!-- Center: Title -->
       <div class="header-title">
@@ -73,10 +103,24 @@ function goToLogin() {
 }
 
 .header-left {
-  flex: 0 0 auto;
+  flex: 0 0 135px;
+  /* Enough width for the largest button or the placeholder.
+     Prevents the title from moving horizontally if button is hidden! */
+  display: flex;
+  align-items: center;
   justify-content: flex-start;
   padding-left: 2vw;
-  /* Give only as much space as needed */
+  min-width: 125px;
+  max-width: 160px;
+  /* Space only for button, keeps title position stable */
+}
+.header-left-placeholder {
+  display: inline-block;
+  width: 125px;
+  min-width: 125px;
+  max-width: 140px;
+  height: 1px;
+  /* visually hidden but maintains the left header area width */
 }
 
 .header-right {
@@ -93,6 +137,10 @@ function goToLogin() {
   justify-content: center;
   align-items: center;
   min-width: 0;
+  /* Ensure header title does not move due to button visibility */
+  padding: 0;
+  margin: 0;
+  width: 100%;
 }
 
 .header-title h1 {
@@ -194,6 +242,12 @@ function goToLogin() {
     max-width: 33vw;
     padding: 0 0.16em;
     flex: 0 0 auto;
+  }
+  .header-left-placeholder {
+    width: 87px;
+    min-width: 78px;
+    max-width: 100px;
+    height: 1px;
   }
   .admin-btn {
     font-size: 0.87em;
