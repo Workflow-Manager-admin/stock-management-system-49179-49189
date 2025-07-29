@@ -30,24 +30,29 @@ defineProps<{
   display: flex;
   align-items: center;
   min-width: 220px;
-  max-width: 350px;
+  max-width: 340px;
   min-height: 100px;
   gap: 1.2rem;
-  border: 1.4px solid #e6e9f9;
-  transition: box-shadow 0.18s, border-color 0.16s;
+  border: 2.2px solid #f1c40f25;
+  box-shadow: 0 4px 10px #f7d99916;
+  border-radius: 18px;
+  transition: box-shadow 0.18s, border-color 0.20s;
+  background: #fffefb;
 }
-.product-card:hover {
+.product-card:focus-within, .product-card:hover {
   box-shadow: var(--card-shadow-alt);
   border-color: var(--accent);
+  outline: 2px solid var(--primary);
 }
 .product-img {
-  width: 62px;
-  height: 62px;
-  border-radius: 9px;
+  width: 66px;
+  height: 66px;
+  border-radius: 12px;
   object-fit: cover;
-  background: #eeeaa266;
+  background: #fff9e8;
   margin-right: 0.2rem;
-  border: 1.5px solid var(--accent);
+  border: 1.8px solid var(--accent);
+  box-shadow: 0 2px 7px #ffe7a233;
 }
 .product-info {
   flex: 1;
@@ -56,20 +61,23 @@ defineProps<{
   justify-content: space-between;
 }
 .product-info h3 {
-  margin: 0 0 0.3rem 0;
-  font-size: 1.09rem;
-  color: var(--text-main);
+  margin: 0 0 0.34rem 0;
+  font-size: 1.13rem;
+  color: #28436a;
   font-weight: 700;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.024em;
+  text-shadow: 0 1px 0 #fded8c26;
 }
 .qty-badge {
-  background: var(--secondary);
+  background: linear-gradient(90deg, var(--secondary), #81dd81 95%);
   color: #fff;
-  border-radius: 8px;
-  padding: 0.20em 0.85em;
-  font-size: 1rem;
-  margin-top: 0.24rem;
+  border-radius: 11px;
+  padding: 0.26em 1.15em 0.26em 0.90em;
+  font-size: 1.04rem;
+  margin-top: 0.20rem;
   width: fit-content;
-  font-weight: 600;
+  font-weight: 700;
+  box-shadow: 0 1.5px 5px #43c96b26;
+  letter-spacing: 0.035em;
 }
 </style>

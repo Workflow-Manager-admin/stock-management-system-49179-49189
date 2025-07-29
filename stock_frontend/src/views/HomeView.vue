@@ -222,23 +222,38 @@ function setCategoryRef(id: number) {
 }
 
 .cat-title {
-  margin: 1.1rem 0 0.2rem 0;
-  font-size: 1.09rem;
+  margin: 1.55rem 0 0.7rem 0;
+  font-size: 1.22rem;
   color: var(--primary);
   display: flex;
   align-items: center;
   font-family: inherit;
+  font-weight: 800;
+  letter-spacing: 0.026em;
+  scroll-margin-top: 2.2em;
+  transition: background 0.2s;
+  background: #f9fafb;
+  border-radius: 14px;
+  min-height: 3.2em;
+  padding: 0.70rem 1.5rem 0.60rem 1.3rem;
+  box-shadow: 0 2px 11px 0 #f4d6641e;
+  border: 1.7px solid #ffe58f48;
+}
+.cat-title span {
+  padding-right: 1.35em;
+  font-size: 1.11em;
   font-weight: 700;
-  letter-spacing: 0.02em;
-  scroll-margin-top: 1.7em;
-  transition: 0.21s background;
+  color: #2b4363;
+  letter-spacing: 0.04em;
+  text-shadow: 0 1px 0 #fff47e2d;
 }
 .cat-divider {
   flex: 1;
-  border-top: 2.5px dashed var(--accent);
-  margin-left: 1rem;
-  margin-bottom: 0.1rem;
+  border-top: 2px dotted var(--accent);
+  margin-left: 1.3rem;
+  margin-bottom: 0.12rem;
   height: 0;
+  opacity: 0.65;
 }
 
 .product-list {
