@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
+import { API_BASE_URL } from '../constants';
 
 // PUBLIC_INTERFACE
 /**
@@ -31,7 +32,11 @@ export const useAuthStore = defineStore('auth', () => {
   async function login(username: string, password: string): Promise<boolean> {
     loginError.value = '';
     try {
-      const resp = await fetch('https://vscode-internal-6-beta.beta01.cloud.kavia.ai:3001/login', {
+      // Backend login endpoint is sourced from the global constant for API base URL.
+      // See src/constants.ts for the authoritative backend URL definition.
+      // Usage: import { API_BASE_URL } from '@/constants'
+
+      const resp = await fetch(`${API_BASE_URL}/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),

@@ -14,7 +14,9 @@ This document describes the **admin authentication** flow and **token handling**
   ```
   POST /login
   ```
-  Example: `https://vscode-internal-6-beta.beta01.cloud.kavia.ai:3001/login`
+  Example: `https://vscode-internal-2114-beta.beta01.cloud.kavia.ai:3001/login`
+  - The base URL for all backend API requests is now set in [`src/constants.ts`](./src/constants.ts) and *NOT* from an environment variable.  
+  - To change backend destination, edit `API_BASE_URL` in the constants file.
 
 - **Request Body:**  
   ```json
@@ -36,9 +38,10 @@ This document describes the **admin authentication** flow and **token handling**
   - `401 Unauthorized`: If credentials are incorrect.
   - `422 Unprocessable Entity`: If request fields are missing or invalid.
 
-#### Example request (with `fetch` in frontend):
+#### Example request (in frontend with the constants file):
 ```js
-const resp = await fetch('https://vscode-internal-6-beta.beta01.cloud.kavia.ai:3001/login', {
+import { API_BASE_URL } from '@/constants'
+const resp = await fetch(`${API_BASE_URL}/login`, {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({ username, password }),

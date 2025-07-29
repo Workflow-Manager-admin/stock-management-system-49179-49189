@@ -4,7 +4,6 @@ import CategorySidebar from '../components/CategorySidebar.vue';
 import CategoryBlock from '../components/CategoryBlock.vue';
 import type { ComponentPublicInstance } from 'vue';
 
-
 // PUBLIC_INTERFACE
 
 /**
@@ -28,9 +27,11 @@ interface Product {
 
 /**
  * API endpoint base for category and product data.
- * @constant
+ * Uses the global API_BASE_URL constant from src/constants.ts.
+ * To change the backend target, update API_BASE_URL in src/constants.ts only.
  */
-const API_BASE = 'https://vscode-internal-6-beta.beta01.cloud.kavia.ai:3001';
+import { API_BASE_URL } from '../constants';
+const API_BASE = API_BASE_URL;
 
 // ----- Reactive State -----
 const categories = ref<Category[]>([]);

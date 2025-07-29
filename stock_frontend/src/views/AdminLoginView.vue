@@ -34,6 +34,13 @@ async function handleLogin() {
   <div class="admin-login-outer">
     <main class="admin-login-center">
       <section class="admin-login-card">
+        <PrimaryButton
+          class="back-home-btn"
+          aria-label="Back to Homepage"
+          @click="router.push({ name: 'home' })"
+        >
+          ← Back to Home
+        </PrimaryButton>
         <h2>Admin Login</h2>
         <form @submit.prevent="handleLogin" autocomplete="on">
           <FormGroup label="Admin Username" for-id="username">
@@ -91,6 +98,7 @@ async function handleLogin() {
   /* Slight upward shift for visual balance */
   transform: translateY(-3%);
 }
+
 /* The card itself */
 .admin-login-card {
   background: var(--surface, #fff);
@@ -104,6 +112,32 @@ async function handleLogin() {
   display: flex;
   flex-direction: column;
   align-items: center;
+  /* add gap to visually separate Back to Home button */
+  gap: 0.9em;
+}
+
+.back-home-btn {
+  width: 100%;
+  margin-bottom: 1.8em;
+  font-size: 1.05em;
+  background: var(--primary, #3498db);
+  color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 18px #36a5eb22;
+  border: 2px solid var(--primary, #3498db);
+  font-weight: 900;
+  letter-spacing: 0.011em;
+  transition: background 0.14s, color 0.13s, border 0.13s, box-shadow 0.19s;
+  padding: 0.9em 0.55em;
+  margin-top: -0.5em;
+  outline: none;
+}
+.back-home-btn:hover,
+.back-home-btn:focus-visible {
+  background: var(--accent, #f1c40f);
+  color: var(--primary, #3498db);
+  border-color: var(--accent, #f1c40f);
+  outline: 2px solid var(--primary, #3498db);
 }
 
 h2 {
@@ -125,7 +159,6 @@ form {
   gap: 1.1em;
 }
 
-/* (removed .login-field-row, .login-error, and button[type="submit"] styles as replaced by reusable components) */
 @media (max-width: 600px) {
   .admin-login-center {
     margin-top: 3vh; /* Less margin on small screens */
@@ -134,6 +167,11 @@ form {
     padding: 1.5em 0.5em 1.5em 0.5em;
     max-width: 99vw;
     min-width: unset;
+  }
+  .back-home-btn {
+    padding: 0.7em 0.3em;
+    font-size: 0.97em;
+    margin-bottom: 1.2em;
   }
   h2 { font-size: 1.38rem; }
   form { gap: 0.92em; }

@@ -59,11 +59,11 @@ function goToPublic(event: Event) {
       <div class="header-left">
         <button
           v-if="adminHeaderButton"
-          class="admin-btn manage-stock-btn"
-          style="min-width:125px;"
+          class="admin-btn manage-stock-btn back-public-btn"
           @click="(e) => adminHeaderButton?.action?.(e)"
+          type="button"
         >
-          {{ adminHeaderButton.label }}
+          <span class="button-text">{{ adminHeaderButton.label }}</span>
         </button>
         <!-- Always render (even if invisible) a "placeholder" of same width to keep title perfectly centered. -->
         <span
@@ -212,10 +212,57 @@ function goToPublic(event: Event) {
   color: #fff;
   margin-left: 0;
   text-align: center;
-  white-space: nowrap;
   font-family: inherit;
   font-weight: 700;
+  /* Remove nowrap for multi-line support */
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  min-width: 0;
+  max-width: 260px;
+  width: auto;
+  box-sizing: border-box;
+  padding-left: 1.1em;
+  padding-right: 1.1em;
 }
+/* Button for Back to Public View specifically: tweaks for long label support */
+.back-public-btn .button-text {
+  display: inline-block;
+  width: 100%;
+  padding: 0;
+  font-size: 1em;
+  font-family: inherit;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.011em;
+  overflow: visible;
+  text-align: center;
+}
+.back-public-btn {
+  min-width: 137px;
+  max-width: 250px;
+  width: auto;
+  padding-left: 1.13em;
+  padding-right: 1.13em;
+  white-space: normal;
+  word-break: normal;
+}
+@media (max-width: 700px) {
+  .admin-btn,
+  .manage-stock-btn,
+  .back-public-btn {
+    font-size: 0.90em !important;
+    min-width: 88px !important;
+    max-width: 135px !important;
+    padding-left: 0.6em !important;
+    padding-right: 0.6em !important;
+    line-height: 1.18;
+  }
+  .back-public-btn .button-text {
+    font-size: 0.98em;
+  }
+}
+
 .manage-stock-btn:hover,
 .manage-stock-btn:focus {
   background: var(--accent);

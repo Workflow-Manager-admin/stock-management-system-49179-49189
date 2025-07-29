@@ -1,6 +1,12 @@
 import { useAuthStore } from '../stores/auth'
+import { API_BASE_URL } from '../constants'
 
-const API_BASE = 'https://vscode-internal-6-beta.beta01.cloud.kavia.ai:3001'
+/**
+ * API base URL is now sourced from the project-wide constant (src/constants.ts).
+ * Do NOT use any environment variable or import.meta.env for the backend URL here.
+ * To update the backend address, edit API_BASE_URL in constants.ts.
+ */
+const API_BASE = API_BASE_URL
 
 /**
  * Category type definition
