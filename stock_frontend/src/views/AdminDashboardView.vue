@@ -27,7 +27,13 @@ async function handleRefillMockData() {
   error.value = ''
   try {
     await adminApi.refillMockData()
-    await loadData()
+    // Immediate data refresh after successful refill
+    const [categoriesData, productsData] = await Promise.all([
+      fetch('https://vscode-internal-6-beta.beta01.cloud.kavia.ai:3001/categories').then(r => r.json()),
+      fetch('https://vscode-internal-6-beta.beta01.cloud.kavia.ai:3001/products').then(r => r.json())
+    ])
+    categories.value = categoriesData
+    products.value = productsData
   } catch (err) {
     console.error('Refill mock data error:', err)
     error.value = 'Failed to refill mock data. Please try again.'
@@ -43,7 +49,16 @@ async function handleClearAllData() {
   error.value = ''
   try {
     await adminApi.clearAllData()
-    await loadData()
+    // Immediately clear local data after successful API call
+    categories.value = []
+    products.value = []
+    // Then refresh from server to ensure consistency
+    const [categoriesData, productsData] = await Promise.all([
+      fetch('https://vscode-internal-6-beta.beta01.cloud.kavia.ai:3001/categories').then(r => r.json()),
+      fetch('https://vscode-internal-6-beta.beta01.cloud.kavia.ai:3001/products').then(r => r.json())
+    ])
+    categories.value = categoriesData
+    products.value = productsData
   } catch (err) {
     console.error('Clear data error:', err)
     error.value = 'Failed to clear data. Please try again.'
@@ -159,15 +174,17 @@ function openProductModal(product?: Product) {
             @click="handleRefillMockData" 
             class="data-btn refill"
             :disabled="loading"
+            aria-label="Refill database with mock data"
           >
-            🔄 Refill Mock Data
+            Refill Mock Data
           </button>
           <button 
             @click="handleClearAllData" 
             class="data-btn clear"
             :disabled="loading"
+            aria-label="Clear all data from database"
           >
-            🗑️ Clear All Data
+            Clear All Data
           </button>
         </div>
       </div>
