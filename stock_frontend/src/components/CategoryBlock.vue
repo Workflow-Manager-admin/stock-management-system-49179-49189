@@ -49,8 +49,10 @@ const props = defineProps<{
         :key="product.id"
         :product="product"
       />
-      <div v-if="props.products.length === 0" class="no-products">
-        No products in this category yet!
+      <div v-if="props.products.length === 0" class="no-products" role="status">
+        <span class="no-products-icon">📦</span>
+        <p>No products in this category yet!</p>
+        <span class="no-products-hint">Products added to this category will appear here.</span>
       </div>
     </div>
   </section>
@@ -109,13 +111,34 @@ const props = defineProps<{
   margin-top: 0.13rem;
 }
 .no-products {
-  font-size: 1.05rem;
-  color: #888;
-  padding: 0.7rem 0.5rem 1rem 0.5rem;
-  border-radius: 10px;
+  text-align: center;
+  padding: 2rem 1rem;
+  border-radius: 15px;
   background: #fffbe3;
-  margin-top: 1rem;
-  font-weight: 400;
+  margin: 1rem auto;
+  width: 100%;
+  border: 2px dashed var(--accent);
+}
+
+.no-products-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.no-products p {
+  font-size: 1.1rem;
+  color: var(--text-main);
+  margin: 0.5rem 0;
+  font-weight: 500;
+}
+
+.no-products-hint {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-top: 0.5rem;
+  font-style: italic;
 }
 @media (max-width: 860px) {
   .category-block {

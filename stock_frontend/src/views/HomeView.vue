@@ -151,6 +151,14 @@ function setCategoryRef(id: number) {
           <div>{{ errorMsg }}</div>
         </div>
       </template>
+      <template v-else-if="categories.length === 0">
+        <div class="empty-state" role="status">
+          <span class="empty-state-icon">🏷️</span>
+          <h2>No Categories Available</h2>
+          <p>There are no product categories to display right now.</p>
+          <p class="empty-state-hint">Check back soon for updates!</p>
+        </div>
+      </template>
       <template v-else>
         <CategoryBlock
           v-for="category in categories"
@@ -212,6 +220,39 @@ function setCategoryRef(id: number) {
   font-weight: 600;
   text-align: left;
 }
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  background: #fff;
+  border-radius: var(--card-radius);
+  margin: 1rem auto;
+  max-width: 500px;
+  border: 2px dashed var(--accent);
+}
+
+.empty-state-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.empty-state h2 {
+  color: var(--primary);
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+  color: var(--text-muted);
+  margin: 0.5rem 0;
+}
+
+.empty-state-hint {
+  font-size: 0.9rem;
+  opacity: 0.8;
+  font-style: italic;
+}
+
 @media (max-width: 860px) {
   .container {
     flex-direction: column;
