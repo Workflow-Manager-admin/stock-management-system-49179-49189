@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import { adminApi } from '@/services/adminApi'
 import type { Category, Product } from '@/services/adminApi'
 import BaseModal from '@/components/ui/BaseModal.vue'
+import ConfirmationDialog from '@/components/ui/ConfirmationDialog.vue'
 import CategoryForm from '@/components/admin/CategoryForm.vue'
 import ProductForm from '@/components/admin/ProductForm.vue'
 import ErrorAlert from '@/components/ui/ErrorAlert.vue'
@@ -19,10 +20,27 @@ const editingCategory = ref<Category | null>(null)
 const editingProduct = ref<Product | null>(null)
 const submitting = ref(false)
 
+// Confirmation dialog state
+const showConfirmDialog = ref(false)
+const confirmDialogConfig = ref({
+  title: '',
+  message: '',
+  action: null as (() => Promise<void>) | null
+})
+
 // Data management
 async function handleRefillMockData() {
-  if (!confirm('Refill with mock data? This will reset all current data.')) return
-  
+  confirmDialogConfig.value = {
+    title: 'Refill Mock Data',
+    message: 'This will reset all current data with sample data. Are you sure?',
+    action: async () => {
+      await performRefillMockData()
+    }
+  }
+  showConfirmDialog.value = true
+}
+
+async function performRefillMockData() {
   loading.value = true
   error.value = ''
   try {
@@ -43,8 +61,17 @@ async function handleRefillMockData() {
 }
 
 async function handleClearAllData() {
-  if (!confirm('Clear all data? This cannot be undone!')) return
-  
+  confirmDialogConfig.value = {
+    title: 'Clear All Data',
+    message: 'This will remove all categories and products. This action cannot be undone. Are you sure?',
+    action: async () => {
+      await performClearAllData()
+    }
+  }
+  showConfirmDialog.value = true
+}
+
+async function performClearAllData() {
   loading.value = true
   error.value = ''
   try {
@@ -109,15 +136,20 @@ async function handleCategorySubmit(data: { name: string }) {
 }
 
 async function deleteCategory(category: Category) {
-  if (!confirm(`Delete category "${category.name}"?`)) return
-  
-  try {
-    await adminApi.deleteCategory(category.id)
-    await loadData()
-  } catch (err) {
-    console.error('Delete category error:', err)
-    error.value = 'Failed to delete category. Please try again.'
+  confirmDialogConfig.value = {
+    title: 'Delete Category',
+    message: `Are you sure you want to delete the category "${category.name}"? This cannot be undone.`,
+    action: async () => {
+      try {
+        await adminApi.deleteCategory(category.id)
+        await loadData()
+      } catch (err) {
+        console.error('Delete category error:', err)
+        error.value = 'Failed to delete category. Please try again.'
+      }
+    }
   }
+  showConfirmDialog.value = true
 }
 
 // Product CRUD
@@ -141,15 +173,20 @@ async function handleProductSubmit(data: { name: string; category_id: number; im
 }
 
 async function deleteProduct(product: Product) {
-  if (!confirm(`Delete product "${product.name}"?`)) return
-  
-  try {
-    await adminApi.deleteProduct(product.id)
-    await loadData()
-  } catch (err) {
-    console.error('Delete product error:', err)
-    error.value = 'Failed to delete product. Please try again.'
+  confirmDialogConfig.value = {
+    title: 'Delete Product',
+    message: `Are you sure you want to delete the product "${product.name}"? This cannot be undone.`,
+    action: async () => {
+      try {
+        await adminApi.deleteProduct(product.id)
+        await loadData()
+      } catch (err) {
+        console.error('Delete product error:', err)
+        error.value = 'Failed to delete product. Please try again.'
+      }
+    }
   }
+  showConfirmDialog.value = true
 }
 
 function openCategoryModal(category?: Category) {
@@ -233,6 +270,9 @@ function openProductModal(product?: Product) {
               </tr>
             </tbody>
           </table>
+          <div v-if="categories.length === 0" class="empty-state">
+            <p>No categories yet! Use the "Add Category" button above to create categories.</p>
+          </div>
         </div>
       </section>
 
@@ -281,9 +321,24 @@ function openProductModal(product?: Product) {
               </tr>
             </tbody>
           </table>
+          <div v-if="products.length === 0" class="empty-state">
+            <p>No products yet! Use the "Add Product" button above to create products, or use "Refill Mock Data" to add sample items.</p>
+          </div>
         </div>
       </section>
     </template>
+
+    <!-- Confirmation Dialog -->
+    <ConfirmationDialog
+      :show="showConfirmDialog"
+      :title="confirmDialogConfig.title"
+      :message="confirmDialogConfig.message"
+      @confirm="async () => {
+        showConfirmDialog = false;
+        if (confirmDialogConfig.action) await confirmDialogConfig.action();
+      }"
+      @cancel="showConfirmDialog = false"
+    />
 
     <!-- Modals -->
     <BaseModal
