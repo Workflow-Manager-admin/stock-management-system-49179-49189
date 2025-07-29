@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import CategorySidebar from '../components/CategorySidebar.vue'
 import ProductCard from '../components/ProductCard.vue'
 
@@ -24,6 +24,10 @@ const products = ref<Product[]>([])
 const errorMsg = ref<string>('')
 const loading = ref(false)
 const selectedCategoryId = ref<number | null>(null)
+// Refs for scrolling
+import type { ComponentPublicInstance } from 'vue'
+type CategorySectionEl = Element | ComponentPublicInstance | null
+const categoryRefs = ref<Record<number, CategorySectionEl>>({})
 
 // Fetch categories and products from API
 async function fetchCategories() {
@@ -31,7 +35,7 @@ async function fetchCategories() {
     const resp = await fetch(`${API_BASE}/categories`)
     if (!resp.ok) throw new Error('Failed to load categories')
     categories.value = await resp.json()
-    // Default select first category
+    // Default select first category for highlight only (but all visible)
     if (categories.value.length > 0) selectedCategoryId.value = categories.value[0].id
   } catch (e: unknown) {
     if (e instanceof Error) {
@@ -62,8 +66,29 @@ onMounted(async () => {
   loading.value = false
 })
 
-function handleSelectCategory(id: number) {
+function isComponentInstance(obj: unknown): obj is ComponentPublicInstance {
+  return !!obj && typeof obj === "object" && "$el" in obj
+}
+
+function getDomElement(ref: CategorySectionEl): HTMLElement | null {
+  if (!ref) return null
+  if (ref instanceof HTMLElement) return ref
+  if (isComponentInstance(ref) && ref.$el instanceof HTMLElement)
+    return ref.$el
+  return null
+}
+
+// When a category is selected (sidebar click), scroll smoothly into view
+async function handleSelectCategory(id: number) {
   selectedCategoryId.value = id
+  // Wait for DOM update, then scroll
+  await nextTick()
+  const refEl = getDomElement(categoryRefs.value[id])
+  if (refEl && typeof refEl.scrollIntoView === 'function') {
+    refEl.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    // Optionally, set focus for accessibility:
+    refEl.focus({ preventScroll: true })
+  }
 }
 
 // Group products by category id
@@ -75,6 +100,13 @@ const productsByCategory = computed(() => {
   })
   return map
 })
+
+function setCategoryRef(id: number) {
+  // Vue provides Element | ComponentPublicInstance | null
+  return (el: CategorySectionEl) => {
+    categoryRefs.value[id] = el
+  }
+}
 </script>
 
 <template>
@@ -85,20 +117,29 @@ const productsByCategory = computed(() => {
       @select="handleSelectCategory"
     />
 
-    <section class="product-section">
+    <section class="product-section all-categories-scroll" aria-label="All product categories, scrollable">
       <template v-if="loading">
         <p class="loading">Loading...</p>
       </template>
       <template v-else-if="errorMsg">
-        <div class="error-box">
+        <div class="error-box" role="alert">
           <strong>Oops!</strong>
           <div>{{ errorMsg }}</div>
         </div>
       </template>
       <template v-else>
         <template v-for="category in categories" :key="category.id">
-          <div v-if="selectedCategoryId === category.id">
-            <h2 class="cat-title">
+          <section
+            class="category-block"
+            :ref="setCategoryRef(category.id)"
+            :tabindex="-1"
+            :aria-label="`Products in ${category.name}`"
+          >
+            <h2
+              class="cat-title"
+              :id="`category-section-${category.id}`"
+              :class="{ highlighted: selectedCategoryId === category.id }"
+            >
               <span>{{ category.name }}</span>
               <div class="cat-divider" />
             </h2>
@@ -112,12 +153,121 @@ const productsByCategory = computed(() => {
                 No products in this category yet!
               </div>
             </div>
-          </div>
+          </section>
         </template>
       </template>
     </section>
   </main>
 </template>
+
+<style scoped>
+.container {
+  display: flex;
+  flex-direction: row;
+  min-height: 420px;
+  max-width: 1200px;
+  margin: 0 auto;
+  align-items: flex-start;
+}
+.product-section {
+  flex: 1;
+  background: #fff;
+  border-radius: var(--card-radius);
+  margin-left: 0;
+  padding: 2.1rem 1.7rem 1.2rem 1.2rem;
+  box-shadow: var(--card-shadow);
+  font-family: inherit;
+  overflow-y: auto;
+  min-width: 0;
+  border: 1.2px solid #e7eafd;
+  /* Set vertical scroll if content exceeds parent */
+  max-height: 78vh;
+  scroll-behavior: smooth;
+}
+/* Ensure longer content gets a vertical scrollbar if needed */
+.all-categories-scroll {
+  overflow-y: auto;
+  max-height: 78vh;
+}
+/* Style for separating sections */
+.category-block {
+  margin-bottom: 2.2rem;
+  outline: none;
+}
+/* Optional: highlight on scroll/focus for accessibility */
+.cat-title.highlighted {
+  outline: 3px solid var(--accent);
+  border-radius: 7px;
+  background: #fffde6;
+}
+
+.loading {
+  color: var(--secondary);
+  font-size: 1.25rem;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 2rem;
+  letter-spacing: 0.015em;
+}
+.error-box {
+  background: #ffebee;
+  color: #af2a2a;
+  border: 1.5px solid var(--danger);
+  padding: 1.1em 1.4em;
+  border-radius: 13px;
+  font-size: 1.1rem;
+  margin-top: 1.2em;
+  font-weight: 600;
+  text-align: left;
+}
+
+.cat-title {
+  margin: 1.1rem 0 0.2rem 0;
+  font-size: 1.09rem;
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  font-family: inherit;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  scroll-margin-top: 1.7em;
+  transition: 0.21s background;
+}
+.cat-divider {
+  flex: 1;
+  border-top: 2.5px dashed var(--accent);
+  margin-left: 1rem;
+  margin-bottom: 0.1rem;
+  height: 0;
+}
+
+.product-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.35rem 2rem;
+}
+
+.no-products {
+  font-size: 1.05rem;
+  color: #888;
+  padding: 0.7rem 0.5rem 1rem 0.5rem;
+  border-radius: 10px;
+  background: #fffbe3;
+  margin-top: 1rem;
+  font-weight: 400;
+}
+@media (max-width: 860px) {
+  .container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .product-section {
+    padding: 1.12rem 0.6rem;
+    margin-top: 1.4rem;
+    max-height: 62vh;
+  }
+}
+</style>
 
 <style scoped>
 .container {

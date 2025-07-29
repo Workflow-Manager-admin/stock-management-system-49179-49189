@@ -19,7 +19,7 @@ function handleSelect(id: number) {
 </script>
 
 <template>
-  <aside class="sidebar">
+  <aside class="sidebar" aria-label="Category navigation">
     <h2 class="sidebar-title">Categories</h2>
     <ul>
       <li
@@ -27,7 +27,11 @@ function handleSelect(id: number) {
         :key="category.id"
         :class="['category-item', { active: selectedCategoryId === category.id }]"
         @click="handleSelect(category.id)"
+        @keydown.enter.space="handleSelect(category.id)"
         tabindex="0"
+        :aria-current="selectedCategoryId === category.id ? 'true' : undefined"
+        :aria-label="`Scroll to category: ${category.name}`"
+        role="button"
       >
         {{ category.name }}
       </li>
