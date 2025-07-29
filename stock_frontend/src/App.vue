@@ -181,7 +181,7 @@ function goToPublic(event: Event) {
   font-family: inherit;
   color: #fff;
   font-weight: 700;
-  padding: 0.5em 1em;
+  padding: 0.6em 1em;
   margin-left: 1em;
   border: 2px solid var(--primary);
   background: var(--primary);
@@ -190,16 +190,20 @@ function goToPublic(event: Event) {
   cursor: pointer;
   min-width: 135px;
   max-width: 180px;
-  height: 2.6em;
-  line-height: 1.2;
+  min-height: 2.6em;
+  height: auto;
+  line-height: 1.15;
   display: flex;
   align-items: center;
   justify-content: center;
   white-space: normal;
   text-align: center;
-  word-break: break-word;
+  word-break: normal;
+  overflow-wrap: break-word;
   hyphens: auto;
-  /* Consistent sizing for all header buttons */
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  /* Improved text handling for header buttons */
 }
 
 .manage-stock-btn {
