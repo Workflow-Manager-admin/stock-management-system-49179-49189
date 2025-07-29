@@ -52,7 +52,7 @@ async function handleLogin() {
 </template>
 
 <style scoped>
-/* Outer flex for full-page centering */
+/* Outer flex for vertical shift above center */
 .admin-login-outer {
   height: 100vh;
   min-height: 100vh;
@@ -60,15 +60,19 @@ async function handleLogin() {
   min-width: 100vw;
   background: var(--background, #f7fafd);
   display: flex;
-  align-items: center;
+  align-items: flex-start; /* Align items to top, then use margin-top to push down */
   justify-content: center;
 }
+
 .admin-login-center {
   width: 100vw;
   height: 100vh;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
+  /* Move login box down to just above center: top 40% visually balanced */
+  margin-top: 7vh; /* ~40% down in viewport, adjusted for box height */
+  /* Provide responsive margin for small screens later */
 }
 /* The card itself */
 .admin-login-card {
@@ -88,11 +92,12 @@ async function handleLogin() {
 h2 {
   text-align: center;
   color: var(--primary, #3498db);
-  font-size: 2.01rem;
+  font-size: 2.02rem;
   font-weight: 900;
   margin: 0 0 1.23em 0;
   font-family: "Segoe UI", "Nunito Sans", Arial, sans-serif;
   letter-spacing: 0.04em;
+  line-height: 1.12;
 }
 
 form {
@@ -123,18 +128,19 @@ label {
 input[type="text"],
 input[type="password"] {
   width: 100%;
-  font-size: 1.14em;
+  font-size: 1.15em;
   font-family: inherit;
   font-weight: 500;
   color: var(--text-main, #25304a);
   background: #f7fafd;
   border: 1.7px solid #dde7f2;
   border-radius: 9px;
-  padding: 0.60em 1.1em;
+  padding: 0.64em 1.12em;
   outline: none;
   transition: border 0.18s, box-shadow 0.17s;
   letter-spacing: 0.01em;
   box-sizing: border-box;
+  line-height: 1.7;
 }
 input[type="text"]:focus,
 input[type="password"]:focus {
@@ -151,16 +157,19 @@ button[type="submit"] {
   font-weight: 700;
   border: none;
   border-radius: 10px;
-  background: linear-gradient(90deg, var(--primary, #3498db) 85%, var(--accent, #f1c40f) 100%);
+  background: var(--primary, #3498db); /* FLAT, single color */
   color: #fff;
   box-shadow: 0 2px 11px #3699e019;
-  transition: background 0.13s, box-shadow 0.13s;
+  transition: background 0.13s, box-shadow 0.13s, color 0.13s;
   letter-spacing: 0.01em;
   cursor: pointer;
+  outline: none;
 }
-button[type="submit"]:hover:not(:disabled) {
-  background: var(--secondary, #296ed9);
-  color: #fff;
+button[type="submit"]:hover:not(:disabled),
+button[type="submit"]:focus-visible:not(:disabled) {
+  background: var(--accent, #f1c40f);
+  color: var(--primary, #3498db);
+  outline: 2px solid var(--primary, #3498db);
 }
 
 /* Disabled state */
@@ -185,6 +194,9 @@ button[type="submit"]:disabled {
   min-width: 70%;
 }
 @media (max-width: 600px) {
+  .admin-login-center {
+    margin-top: 3vh; /* Less margin on small screens */
+  }
   .admin-login-card {
     padding: 1.5em 0.5em 1.5em 0.5em;
     max-width: 99vw;
