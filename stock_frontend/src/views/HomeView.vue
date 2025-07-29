@@ -238,6 +238,8 @@ function setCategoryRef(id: number) {
   padding: 0.70rem 1.5rem 0.60rem 1.3rem;
   box-shadow: 0 2px 11px 0 #f4d6641e;
   border: 1.7px solid #ffe58f48;
+  /* New: extra margin below heading for product spacing */
+  margin-bottom: 0.95rem;
 }
 .cat-title span {
   padding-right: 1.35em;
@@ -256,7 +258,15 @@ function setCategoryRef(id: number) {
   opacity: 0.65;
 }
 
+/* Optionally add a top margin to product-list for even more gap */
 .product-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.35rem 2rem;
+  margin-top: 0.13rem;
+}
+
+.no-products {
   display: flex;
   flex-wrap: wrap;
   gap: 1.35rem 2rem;
@@ -335,6 +345,8 @@ function setCategoryRef(id: number) {
   font-family: inherit;
   font-weight: 700;
   letter-spacing: 0.02em;
+  /* Add spacing below for product separation */
+  margin-bottom: 0.85rem;
 }
 .cat-divider {
   flex: 1;
