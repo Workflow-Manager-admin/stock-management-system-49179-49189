@@ -10,14 +10,11 @@ import ErrorAlert from '@/components/ui/ErrorAlert.vue'
 
 /**
  * API endpoint base for category and product data.
- * Sourced from the environment variable VUE_APP_BACKEND_BASE_URL
+ * Sourced from the global project constant in src/constants.ts.
+ * To update the backend used by the frontend, change API_BASE_URL in src/constants.ts.
  */
-const API_BASE = import.meta.env.VUE_APP_BACKEND_BASE_URL as string;
-if (!API_BASE) {
-  // Development warning for missing env
-  // eslint-disable-next-line no-console
-  console.warn('VUE_APP_BACKEND_BASE_URL not set! Check your .env configuration.');
-}
+import { API_BASE_URL } from '../constants';
+const API_BASE = API_BASE_URL;
 
 const categories = ref<Category[]>([])
 const products = ref<Product[]>([])

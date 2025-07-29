@@ -1,15 +1,12 @@
 import { useAuthStore } from '../stores/auth'
+import { API_BASE_URL } from '../constants'
 
 /**
- * API base URL is sourced from environment variable for flexibility.
- * Ensure VUE_APP_BACKEND_BASE_URL is defined in your .env file.
+ * API base URL is now sourced from the project-wide constant (src/constants.ts).
+ * Do NOT use any environment variable or import.meta.env for the backend URL here.
+ * To update the backend address, edit API_BASE_URL in constants.ts.
  */
-const API_BASE = import.meta.env.VUE_APP_BACKEND_BASE_URL as string
-if (!API_BASE) {
-  // For dev assurance, log if not set
-  // eslint-disable-next-line no-console
-  console.warn('VUE_APP_BACKEND_BASE_URL not set! Check your .env configuration.')
-}
+const API_BASE = API_BASE_URL
 
 /**
  * Category type definition

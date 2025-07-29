@@ -4,7 +4,6 @@ import CategorySidebar from '../components/CategorySidebar.vue';
 import CategoryBlock from '../components/CategoryBlock.vue';
 import type { ComponentPublicInstance } from 'vue';
 
-
 // PUBLIC_INTERFACE
 
 /**
@@ -28,14 +27,11 @@ interface Product {
 
 /**
  * API endpoint base for category and product data.
- * Sourced from the environment variable VUE_APP_BACKEND_BASE_URL
+ * Uses the global API_BASE_URL constant from src/constants.ts.
+ * To change the backend target, update API_BASE_URL in src/constants.ts only.
  */
-const API_BASE = import.meta.env.VUE_APP_BACKEND_BASE_URL as string;
-if (!API_BASE) {
-  // Development warning for missing env
-  // eslint-disable-next-line no-console
-  console.warn('VUE_APP_BACKEND_BASE_URL not set! Check your .env configuration.');
-}
+import { API_BASE_URL } from '../constants';
+const API_BASE = API_BASE_URL;
 
 // ----- Reactive State -----
 const categories = ref<Category[]>([]);

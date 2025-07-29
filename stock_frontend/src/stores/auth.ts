@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
+import { API_BASE_URL } from '../constants';
 
 // PUBLIC_INTERFACE
 /**
@@ -31,13 +32,11 @@ export const useAuthStore = defineStore('auth', () => {
   async function login(username: string, password: string): Promise<boolean> {
     loginError.value = '';
     try {
-      // Use environment variable for backend login endpoint
-      const API_BASE = import.meta.env.VUE_APP_BACKEND_BASE_URL as string;
-      if (!API_BASE) {
-        // eslint-disable-next-line no-console
-        console.warn('VUE_APP_BACKEND_BASE_URL not set! Login endpoint may not work.');
-      }
-      const resp = await fetch(`${API_BASE}/login`, {
+      // Backend login endpoint is sourced from the global constant for API base URL.
+      // See src/constants.ts for the authoritative backend URL definition.
+      // Usage: import { API_BASE_URL } from '@/constants'
+
+      const resp = await fetch(`${API_BASE_URL}/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
