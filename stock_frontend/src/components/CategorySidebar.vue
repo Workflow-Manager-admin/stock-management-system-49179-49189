@@ -37,23 +37,25 @@ function handleSelect(id: number) {
 
 <style scoped>
 .sidebar {
-  background: #3498db;
-  padding: 1rem 0.5rem 1rem 0.5rem;
-  border-radius: 14px;
-  min-width: 170px;
-  max-width: 190px;
-  color: #fff;
+  background: #fff;
+  padding: 1.3rem 0.7rem 1.3rem 0.7rem;
+  border-radius: var(--card-radius);
+  min-width: 175px;
+  max-width: 220px;
+  color: var(--text-main);
   margin-right: 2rem;
-  font-family: 'Comic Sans MS', 'Comic Sans', cursive, Arial, sans-serif;
-  box-shadow: 2px 2px 12px #cce6ff44;
+  font-family: inherit;
+  box-shadow: var(--card-shadow);
+  border: 1.4px solid #e7eafd;
+  align-self: flex-start;
 }
 .sidebar-title {
-  font-size: 1.2rem;
-  font-weight: bold;
-  margin: 0 0 1rem 0;
-  color: #fffbea;
+  font-size: 1.14rem;
+  font-weight: 700;
+  margin-bottom: 1.25rem;
+  color: var(--primary);
   text-align: center;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
 }
 ul {
   list-style: none;
@@ -62,20 +64,21 @@ ul {
 }
 .category-item {
   cursor: pointer;
-  border-radius: 8px;
-  padding: 0.6rem 1rem;
+  border-radius: 10px;
+  padding: 0.64rem 1.15rem;
   margin-bottom: 0.5rem;
-  background: #2980b9;
-  transition: 0.2s;
+  background: none;
+  border: none;
+  transition: background 0.14s, color 0.14s;
   outline: none;
-  font-size: 1.04rem;
+  font-size: 1.02rem;
   text-align: left;
+  color: var(--text-main);
+  font-weight: 500;
 }
 .category-item.active, .category-item:hover, .category-item:focus {
-  background: #f1c40f;
+  background: var(--accent);
   color: #205889;
-  font-weight: bold;
-  border: 2px solid #fff3;
-  box-shadow: 0 0 0 2px #f9e79f85;
+  font-weight: 700;
 }
 </style>

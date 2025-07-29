@@ -126,32 +126,33 @@ const productsByCategory = computed(() => {
   min-height: 420px;
   max-width: 1200px;
   margin: 0 auto;
+  align-items: flex-start;
 }
-
 .product-section {
   flex: 1;
   background: #fff;
-  border-radius: 18px;
+  border-radius: var(--card-radius);
   margin-left: 0;
-  padding: 2.4rem 1.9rem 1.5rem 1.5rem;
-  box-shadow: 0 4px 24px #c3dce69c;
-  font-family: 'Comic Sans MS', 'Comic Sans', Arial, cursive, sans-serif;
+  padding: 2.1rem 1.7rem 1.2rem 1.2rem;
+  box-shadow: var(--card-shadow);
+  font-family: inherit;
   overflow-x: auto;
   min-width: 0;
+  border: 1.2px solid #e7eafd;
 }
 
 .loading {
-  color: #2ecc71;
-  font-size: 1.5rem;
+  color: var(--secondary);
+  font-size: 1.25rem;
   font-weight: bold;
   text-align: center;
   margin-top: 2rem;
+  letter-spacing: 0.015em;
 }
-
 .error-box {
-  background: #ffcdd2;
-  color: #b71c1c;
-  border: 2px solid #f44336;
+  background: #ffebee;
+  color: #af2a2a;
+  border: 1.5px solid var(--danger);
   padding: 1.1em 1.4em;
   border-radius: 13px;
   font-size: 1.1rem;
@@ -161,40 +162,46 @@ const productsByCategory = computed(() => {
 }
 
 .cat-title {
-  margin: 1.3rem 0 0.2rem 0;
-  font-size: 1.32rem;
-  color: #3498db;
+  margin: 1.1rem 0 0.2rem 0;
+  font-size: 1.09rem;
+  color: var(--primary);
   display: flex;
   align-items: center;
   font-family: inherit;
+  font-weight: 700;
+  letter-spacing: 0.02em;
 }
 .cat-divider {
   flex: 1;
-  border-top: 3px dashed #f1c40f;
-  margin-left: 1.2rem;
+  border-top: 2.5px dashed var(--accent);
+  margin-left: 1rem;
   margin-bottom: 0.1rem;
   height: 0;
 }
+
 .product-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 1.5rem 2.5rem;
+  gap: 1.35rem 2rem;
 }
 
 .no-products {
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   color: #888;
-  padding: 1rem 0.5rem 1rem 0.5rem;
+  padding: 0.7rem 0.5rem 1rem 0.5rem;
   border-radius: 10px;
-  background: #f9e79f44;
+  background: #fffbe3;
   margin-top: 1rem;
+  font-weight: 400;
 }
-@media (max-width: 720px) {
+@media (max-width: 860px) {
   .container {
     flex-direction: column;
+    align-items: stretch;
   }
   .product-section {
-    padding: 1.2rem 0.7rem;
+    padding: 1.12rem 0.6rem;
+    margin-top: 1.4rem;
   }
 }
 </style>
