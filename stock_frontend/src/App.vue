@@ -165,23 +165,28 @@ function goToPublic() {
 
 .admin-btn {
   border-radius: 8px;
-  font-size: 1em;
+  font-size: 0.95em;
   font-family: inherit;
   color: #fff;
   font-weight: 700;
-  padding: 0.5em 1.4em;
+  padding: 0.5em 1em;
   margin-left: 1em;
   border: 2px solid var(--primary);
   background: var(--primary);
   box-shadow: 0 2px 12px #3498db13;
   transition: all 0.17s ease;
   cursor: pointer;
-  min-width: 125px;
+  min-width: 135px;
+  max-width: 180px;
   height: 2.6em;
-  line-height: 1;
+  line-height: 1.2;
   display: flex;
   align-items: center;
   justify-content: center;
+  white-space: normal;
+  text-align: center;
+  word-break: break-word;
+  hyphens: auto;
   /* Consistent sizing for all header buttons */
 }
 
@@ -254,11 +259,15 @@ function goToPublic() {
     height: 1px;
   }
   .admin-btn {
-    font-size: 0.87em;
-    min-width: 87px;
-    padding: 0.5em 1em;
+    font-size: 0.85em;
+    min-width: 100px;
+    max-width: 140px;
+    padding: 0.4em 0.8em;
     margin-left: .23em;
-    height: 2.4em;
+    height: auto;
+    min-height: 2.4em;
+    line-height: 1.2;
+    white-space: normal;
   }
 }
 
