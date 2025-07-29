@@ -169,22 +169,26 @@ function goToPublic() {
   font-family: inherit;
   color: #fff;
   font-weight: 700;
-  padding: 0.42em 1.4em;
+  padding: 0.5em 1.4em;
   margin-left: 1em;
   border: 2px solid var(--primary);
   background: var(--primary);
   box-shadow: 0 2px 12px #3498db13;
-  transition: background 0.17s, border 0.17s, color 0.15s;
+  transition: all 0.17s ease;
   cursor: pointer;
-  min-width: 118px;
-  /* Decrease min-width so buttons only reserve space they need, prevents squeezing of title */
+  min-width: 125px;
+  height: 2.6em;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Consistent sizing for all header buttons */
 }
 
 .manage-stock-btn {
   border-color: var(--primary);
   background: var(--primary);
   color: #fff;
-  min-width: 125px;
   margin-left: 0;
 }
 .manage-stock-btn:hover,
@@ -251,12 +255,10 @@ function goToPublic() {
   }
   .admin-btn {
     font-size: 0.87em;
-    min-width: 78px;
-    padding: 0.33em 0.67em;
-    margin-left: .23em;
-  }
-  .manage-stock-btn {
     min-width: 87px;
+    padding: 0.5em 1em;
+    margin-left: .23em;
+    height: 2.4em;
   }
 }
 
