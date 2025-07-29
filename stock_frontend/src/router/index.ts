@@ -14,7 +14,12 @@ const routes = [
     component: AdminLoginView,
     meta: { requiresGuest: true }
   },
-  // Future admin-only routes go here, with meta: { requiresAdmin: true }
+  {
+    path: '/admin-dashboard',
+    name: 'admin-dashboard',
+    component: () => import('../views/AdminDashboardView.vue'),
+    meta: { requiresAdmin: true }
+  },
 ]
 
 const router = createRouter({

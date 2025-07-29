@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { RouterView, useRouter } from 'vue-router'
+import { RouterView, useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from './stores/auth'
 import { computed } from 'vue'
+import AdminNavButton from './components/AdminNavButton.vue'
 
 const auth = useAuthStore()
 const router = useRouter()
+const route = useRoute()
 const isAdmin = computed(() => auth.isAdmin)
 
 function handleLogout() {
@@ -15,6 +17,11 @@ function handleLogout() {
 function goToLogin() {
   router.push({ name: 'admin-login' })
 }
+
+// Don't show floating nav button on login page (no admin dashboard page yet)
+const showAdminNavButton = computed(() =>
+  route.name !== 'admin-login'
+)
 </script>
 
 <template>
@@ -29,6 +36,7 @@ function goToLogin() {
       </button>
     </nav>
   </header>
+  <AdminNavButton v-if="showAdminNavButton" />
   <RouterView />
 </template>
 
