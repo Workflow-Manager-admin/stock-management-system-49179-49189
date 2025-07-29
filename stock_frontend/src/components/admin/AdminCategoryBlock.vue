@@ -23,13 +23,18 @@ const props = defineProps<{
   products: Product[]
 }>()
 
-const emit = defineEmits<{
-  (e: 'add-product', categoryId: number): void
-  (e: 'edit-category', category: Category): void
-  (e: 'delete-category', category: Category): void
+interface AdminProduct extends Product {
+  _isUpdatingQty?: boolean
+}
 
-  (e: 'edit-product', product: Product, category: Category): void
-  (e: 'delete-product', product: Product, category: Category): void
+const emit = defineEmits<{
+  (e: 'add-product', categoryId: number): void;
+  (e: 'edit-category', category: Category): void;
+  (e: 'delete-category', category: Category): void;
+
+  (e: 'edit-product', product: Product, category: Category): void;
+  (e: 'delete-product', product: Product, category: Category): void;
+  (e: 'product-qty-change', product: AdminProduct, delta: number): void;
 }>()
 </script>
 
@@ -75,7 +80,32 @@ const emit = defineEmits<{
           :key="product.id"
           class="admin-product-card-row"
         >
-          <ProductCard :product="product" />
+          <div class="product-qty-action-wrap">
+            <!-- ProductCard as usual -->
+            <ProductCard :product="product" />
+            <!-- Inline stock actions (+/-) visually distinct, admin-only -->
+            <div class="qty-inline-controls" aria-label="Quantity adjustment" :aria-describedby="`product-qty-desc-${product.id}`">
+              <button
+                class="qty-btn minus"
+                :disabled="(product as AdminProduct)._isUpdatingQty || product.quantity <= 0"
+                @click="() => emit('product-qty-change', product as AdminProduct, -1)"
+                aria-label="Decrease quantity"
+                title="Decrease quantity"
+                :tabindex="0"
+              >−</button>
+              <span class="qty-current" :id="`product-qty-desc-${product.id}`">
+                {{ (product as AdminProduct)._isUpdatingQty ? '...' : product.quantity }}
+              </span>
+              <button
+                class="qty-btn plus"
+                :disabled="(product as AdminProduct)._isUpdatingQty"
+                @click="() => emit('product-qty-change', product as AdminProduct, +1)"
+                aria-label="Increase quantity"
+                title="Increase quantity"
+                :tabindex="0"
+              >+</button>
+            </div>
+          </div>
           <div class="prod-actions">
             <button
               class="icon-btn"
@@ -115,6 +145,66 @@ const emit = defineEmits<{
   box-shadow: var(--card-shadow);
   padding: 1.0em 1.5em 1.35em 1.25em;
   border: 1.7px solid #ffe58f48;
+}
+
+.product-qty-action-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.95rem;
+  min-width: 0;
+}
+
+/* Inline quantity controls (admin +/−) styling */
+.qty-inline-controls {
+  display: flex;
+  align-items: center;
+  background: #fffbea;
+  border-radius: 13px;
+  border: 2px solid var(--accent, #f1c40f);
+  padding: 0.12em 0.61em;
+  box-shadow: 0 1.8px 7px #f1c40f26;
+  margin-left: 0.35em;
+  gap: 0.27em;
+}
+
+.qty-btn {
+  background: var(--accent, #f1c40f);
+  border: none;
+  color: var(--primary, #3498db);
+  font-size: 1.35em;
+  font-weight: 700;
+  padding: 0.12em 0.68em;
+  border-radius: 8px;
+  transition: background 0.14s, color 0.12s, opacity 0.14s;
+  cursor: pointer;
+  min-width: 1.6em;
+  outline: none;
+  margin: 0 0.2em;
+  box-shadow: 0 1.5px 7px #ffe9b0aa;
+}
+.qty-btn.plus {
+  background: var(--secondary, #2ecc71);
+  color: #fff;
+}
+.qty-btn.minus {
+  background: var(--danger, #ef5350);
+  color: #fff;
+}
+.qty-btn:disabled {
+  opacity: 0.56;
+  cursor: not-allowed;
+}
+.qty-current {
+  display: inline-block;
+  min-width: 1.9em;
+  padding: 0 0.35em;
+  text-align: center;
+  font-weight: 900;
+  color: #764c04;
+  background: #fffbe3;
+  border-radius: 7px;
+  font-size: 1.1em;
+  letter-spacing: 0.019em;
 }
 
 .cat-header-row {

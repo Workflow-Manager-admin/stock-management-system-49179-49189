@@ -182,16 +182,36 @@ async function loadData() {
 onMounted(loadData)
 
 // --- CRUD handlers, adapted for category-grouped view ---
+/**
+ * Handle creation or renaming of a category.
+ * On rename: if the changed category is currently selected, after reload and next tick,
+ * restore scroll/focus to the renamed block (by id).
+ */
 async function handleCategorySubmit(data: { name: string }) {
   submitting.value = true
   try {
+    let renamedCategoryId: number | null = null
     if (editingCategory.value) {
+      renamedCategoryId = editingCategory.value.id
       await adminApi.updateCategory(editingCategory.value.id, data)
     } else {
       await adminApi.createCategory(data)
     }
     await loadData()
     showCategoryModal.value = false
+    // If we just renamed the currently selected category, scroll back to it smoothly
+    if (
+      renamedCategoryId &&
+      selectedCategoryId.value === renamedCategoryId &&
+      categoryRefs.value[renamedCategoryId]
+    ) {
+      await nextTick()
+      const refEl = getDomElement(categoryRefs.value[renamedCategoryId])
+      if (refEl && typeof refEl.scrollIntoView === 'function') {
+        refEl.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        refEl.focus?.({ preventScroll: true })
+      }
+    }
   } catch (err) {
     console.error('Save category error:', err)
     error.value = 'Failed to save category. Please try again.'
@@ -272,6 +292,48 @@ function openProductModal(product?: Product | null, categoryId?: number) {
   }
   showProductModal.value = true
 }
+/**
+ * Inline stock adjustment for product, with + or -.
+ * Handles UI loading state per product, disables buttons during update, updates local state on success.
+ */
+/**
+ * Locally-extended product type for admin UI loading state to satisfy TypeScript.
+ */
+type AdminProduct = Product & { _isUpdatingQty?: boolean };
+
+/**
+ * Inline stock adjustment for product, with + or -.
+ * Handles UI loading state per product, disables buttons during update, updates local state on success.
+ */
+async function handleProductQtyChange(product: AdminProduct, delta: number) {
+  // Find and update local loading state ("_isUpdatingQty" is used only for UI temporary state)
+  const prod = products.value.find((p) => p.id === product.id) as AdminProduct | undefined;
+  if (!prod) return;
+  // Prevent concurrent updates
+  if (prod._isUpdatingQty) return;
+  // Never decrement below 0
+  if (delta < 0 && prod.quantity <= 0) return;
+
+  // Mark as loading (add _isUpdatingQty temp field)
+  prod._isUpdatingQty = true;
+
+  const newQty = prod.quantity + delta;
+  try {
+    await adminApi.updateProduct(prod.id, {
+      name: prod.name,
+      category_id: prod.category_id,
+      image_url: prod.image_url,
+      quantity: newQty
+    });
+    // On success, update the value locally so UI is responsive
+    prod.quantity = newQty;
+  } catch (err) {
+    console.error('Inline stock update error:', err);
+    error.value = 'Failed to update quantity. Please try again.';
+  } finally {
+    prod._isUpdatingQty = false;
+  }
+}
 </script>
 
 <template>
@@ -323,7 +385,10 @@ function openProductModal(product?: Product | null, categoryId?: number) {
               v-for="cat in categories"
               :key="cat.id"
               :category="cat"
-              :products="productsByCategory[cat.id] || []"
+              :products="productsByCategory[cat.id] ? (productsByCategory[cat.id].map(prod => ({
+                ...prod,
+                _isUpdatingQty: (prod as AdminProduct)._isUpdatingQty || false
+              })) as AdminProduct[]) : []"
               :ref="setCategoryRef(cat.id)"
               :class="{ 'highlighted-block': selectedCategoryId === cat.id }"
               @add-product="(catId) => openProductModal(null, catId)" 
@@ -331,6 +396,7 @@ function openProductModal(product?: Product | null, categoryId?: number) {
               @delete-category="deleteCategory"
               @edit-product="(product, category) => openProductModal(product, category.id)"
               @delete-product="deleteProduct"
+              @product-qty-change="handleProductQtyChange"
             />
           </div>
         </section>
