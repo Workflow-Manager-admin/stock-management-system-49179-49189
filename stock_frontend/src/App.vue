@@ -26,8 +26,8 @@ interface HeaderButton {
 const adminHeaderButton = computed<HeaderButton | null>(() => {
   if (!isAdmin.value) return null;
   return isOnAdminDashboard.value
-    ? { label: '← Back to Public View', action: goToPublic }
-    : { label: '⚙️ Manage Stock', action: goToDashboard };
+    ? { label: 'Back to Public View', action: goToPublic }
+    : { label: 'Manage Stock', action: goToDashboard };
 });
 
 function handleLogout() {
@@ -207,13 +207,18 @@ function goToPublic(event: Event) {
   background: var(--primary);
   color: #fff;
   margin-left: 0;
+  text-align: center;
+  white-space: nowrap;
+  font-family: inherit;
+  font-weight: 700;
 }
 .manage-stock-btn:hover,
 .manage-stock-btn:focus {
   background: var(--accent);
   color: var(--primary);
   border-color: var(--accent);
-  outline: 0;
+  outline: 2px solid var(--primary);
+  box-shadow: 0 2px 12px #f1c40f33;
 }
 
 .login-btn {
