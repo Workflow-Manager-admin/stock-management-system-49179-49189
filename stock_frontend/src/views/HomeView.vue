@@ -1,111 +1,134 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, nextTick } from 'vue'
-import CategorySidebar from '../components/CategorySidebar.vue'
-import ProductCard from '../components/ProductCard.vue'
+import { ref, computed, onMounted, nextTick } from 'vue';
+import CategorySidebar from '../components/CategorySidebar.vue';
+import ProductCard from '../components/ProductCard.vue';
+import type { ComponentPublicInstance } from 'vue';
 
+// PUBLIC_INTERFACE
+
+/**
+ * Category type for category navigation.
+ */
 interface Category {
-  id: number
-  name: string
+  id: number;
+  name: string;
 }
+
+/**
+ * Product type for display/product list.
+ */
 interface Product {
-  id: number
-  name: string
-  category_id: number
-  image_url: string
-  quantity: number
+  id: number;
+  name: string;
+  category_id: number;
+  image_url: string;
+  quantity: number;
 }
 
-// API endpoint origins
-const API_BASE = 'https://vscode-internal-6-beta.beta01.cloud.kavia.ai:3001'
+/**
+ * API endpoint base for category and product data.
+ * @constant
+ */
+const API_BASE = 'https://vscode-internal-6-beta.beta01.cloud.kavia.ai:3001';
 
-// State
-const categories = ref<Category[]>([])
-const products = ref<Product[]>([])
-const errorMsg = ref<string>('')
-const loading = ref(false)
-const selectedCategoryId = ref<number | null>(null)
-// Refs for scrolling
-import type { ComponentPublicInstance } from 'vue'
-type CategorySectionEl = Element | ComponentPublicInstance | null
-const categoryRefs = ref<Record<number, CategorySectionEl>>({})
+// ----- Reactive State -----
+const categories = ref<Category[]>([]);
+const products = ref<Product[]>([]);
+const errorMsg = ref<string>('');
+const loading = ref<boolean>(false);
+const selectedCategoryId = ref<number | null>(null);
 
-// Fetch categories and products from API
-async function fetchCategories() {
+// Reference storage for scrolling/focus to correct category block
+type CategorySectionEl = Element | ComponentPublicInstance | null;
+const categoryRefs = ref<Record<number, CategorySectionEl>>({});
+
+/**
+ * Fetch category data and select first on load (highlight only)
+ */
+async function fetchCategories(): Promise<void> {
   try {
-    const resp = await fetch(`${API_BASE}/categories`)
-    if (!resp.ok) throw new Error('Failed to load categories')
-    categories.value = await resp.json()
-    // Default select first category for highlight only (but all visible)
-    if (categories.value.length > 0) selectedCategoryId.value = categories.value[0].id
+    const resp = await fetch(`${API_BASE}/categories`);
+    if (!resp.ok) throw new Error('Failed to load categories');
+    categories.value = await resp.json();
+    if (categories.value.length > 0) selectedCategoryId.value = categories.value[0].id;
   } catch (e: unknown) {
-    if (e instanceof Error) {
-      errorMsg.value = e.message
-    } else {
-      errorMsg.value = 'Something went wrong loading categories.'
-    }
-  }
-}
-async function fetchProducts() {
-  try {
-    const resp = await fetch(`${API_BASE}/products`)
-    if (!resp.ok) throw new Error('Failed to load products')
-    products.value = await resp.json()
-  } catch (e: unknown) {
-    if (e instanceof Error) {
-      errorMsg.value = e.message
-    } else {
-      errorMsg.value = 'Something went wrong loading products.'
-    }
+    errorMsg.value =
+      e instanceof Error ? e.message : 'Something went wrong loading categories.';
   }
 }
 
+/**
+ * Fetch products data.
+ */
+async function fetchProducts(): Promise<void> {
+  try {
+    const resp = await fetch(`${API_BASE}/products`);
+    if (!resp.ok) throw new Error('Failed to load products');
+    products.value = await resp.json();
+  } catch (e: unknown) {
+    errorMsg.value =
+      e instanceof Error ? e.message : 'Something went wrong loading products.';
+  }
+}
+
+// One-time data load
 onMounted(async () => {
-  loading.value = true
-  errorMsg.value = ''
-  await Promise.all([fetchCategories(), fetchProducts()])
-  loading.value = false
-})
+  loading.value = true;
+  errorMsg.value = '';
+  await Promise.all([fetchCategories(), fetchProducts()]);
+  loading.value = false;
+});
 
+/**
+ * Util: True if given object is a Vue component instance.
+ */
 function isComponentInstance(obj: unknown): obj is ComponentPublicInstance {
-  return !!obj && typeof obj === "object" && "$el" in obj
+  return !!obj && typeof obj === 'object' && '$el' in obj;
 }
 
+/**
+ * Get HTMLElement from a ref/value that may be a component or DOM node.
+ */
 function getDomElement(ref: CategorySectionEl): HTMLElement | null {
-  if (!ref) return null
-  if (ref instanceof HTMLElement) return ref
-  if (isComponentInstance(ref) && ref.$el instanceof HTMLElement)
-    return ref.$el
-  return null
+  if (!ref) return null;
+  if (ref instanceof HTMLElement) return ref;
+  if (isComponentInstance(ref) && ref.$el instanceof HTMLElement) return ref.$el;
+  return null;
 }
 
-// When a category is selected (sidebar click), scroll smoothly into view
-async function handleSelectCategory(id: number) {
-  selectedCategoryId.value = id
-  // Wait for DOM update, then scroll
-  await nextTick()
-  const refEl = getDomElement(categoryRefs.value[id])
+/**
+ * Scroll to category section after selection (sidebar).
+ */
+async function handleSelectCategory(id: number): Promise<void> {
+  selectedCategoryId.value = id;
+  await nextTick();
+  const refEl = getDomElement(categoryRefs.value[id]);
   if (refEl && typeof refEl.scrollIntoView === 'function') {
-    refEl.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    // Optionally, set focus for accessibility:
-    refEl.focus({ preventScroll: true })
+    refEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Optional focus for accessibility:
+    refEl.focus?.({ preventScroll: true });
   }
 }
 
-// Group products by category id
+/**
+ * Group products by category id (computed for efficient lookup).
+ */
 const productsByCategory = computed(() => {
-  const map: Record<number, Product[]> = {}
-  products.value.forEach(p => {
-    if (!map[p.category_id]) map[p.category_id] = []
-    map[p.category_id].push(p)
-  })
-  return map
-})
+  const map: Record<number, Product[]> = {};
+  products.value.forEach((p) => {
+    if (!map[p.category_id]) map[p.category_id] = [];
+    map[p.category_id].push(p);
+  });
+  return map;
+});
 
+/**
+ * Returns a ref setter for each category block.
+ */
 function setCategoryRef(id: number) {
-  // Vue provides Element | ComponentPublicInstance | null
   return (el: CategorySectionEl) => {
-    categoryRefs.value[id] = el
-  }
+    categoryRefs.value[id] = el;
+  };
 }
 </script>
 

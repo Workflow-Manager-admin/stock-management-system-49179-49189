@@ -1,25 +1,33 @@
 <script setup lang="ts">
-import { defineProps } from 'vue'
+import { defineProps } from 'vue';
 
+// PUBLIC_INTERFACE
+/**
+ * ProductCard component: displays product image, name, and quantity badge.
+ */
 interface Product {
-  id: number
-  name: string
-  image_url: string
-  quantity: number
+  id: number;
+  name: string;
+  image_url: string;
+  quantity: number;
 }
 
-defineProps<{
-  product: Product
-}>()
+const props = defineProps<{
+  product: Product;
+}>();
 </script>
 
 <template>
   <div class="product-card card">
-    <img :src="product.image_url" :alt="product.name" class="product-img" />
+    <img
+      :src="props.product.image_url"
+      :alt="props.product.name"
+      class="product-img"
+    />
     <div class="product-info">
-      <h3>{{ product.name }}</h3>
+      <h3>{{ props.product.name }}</h3>
       <div class="qty-badge">
-        <strong>Qty:</strong> {{ product.quantity }}
+        <strong>Qty:</strong> {{ props.product.quantity }}
       </div>
     </div>
   </div>
@@ -39,7 +47,8 @@ defineProps<{
   transition: box-shadow 0.18s, border-color 0.20s;
   background: #fffefb;
 }
-.product-card:focus-within, .product-card:hover {
+.product-card:focus-within,
+.product-card:hover {
   box-shadow: var(--card-shadow-alt);
   border-color: var(--accent);
   outline: 2px solid var(--primary);
