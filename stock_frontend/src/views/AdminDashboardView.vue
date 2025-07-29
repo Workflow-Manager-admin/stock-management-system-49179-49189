@@ -1,3 +1,7 @@
+<!--
+  AdminDashboardView.vue
+  Clean SFC: only one <script setup>, grouped card-based admin dashboard using AdminCategoryBlock.
+-->
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { adminApi } from '@/services/adminApi'
@@ -7,14 +11,10 @@ import ConfirmationDialog from '@/components/ui/ConfirmationDialog.vue'
 import CategoryForm from '@/components/admin/CategoryForm.vue'
 import ProductForm from '@/components/admin/ProductForm.vue'
 import ErrorAlert from '@/components/ui/ErrorAlert.vue'
+import AdminCategoryBlock from '@/components/admin/AdminCategoryBlock.vue'
 
-/**
- * API endpoint base for category and product data.
- * Sourced from the global project constant in src/constants.ts.
- * To update the backend used by the frontend, change API_BASE_URL in src/constants.ts.
- */
-import { API_BASE_URL } from '../constants';
-const API_BASE = API_BASE_URL;
+import { API_BASE_URL } from '../constants'
+const API_BASE = API_BASE_URL
 
 const categories = ref<Category[]>([])
 const products = ref<Product[]>([])
@@ -27,6 +27,7 @@ const showProductModal = ref(false)
 const editingCategory = ref<Category | null>(null)
 const editingProduct = ref<Product | null>(null)
 const submitting = ref(false)
+const pendingProductCategoryId = ref<number | null>(null)
 
 // Confirmation dialog state
 const showConfirmDialog = ref(false)
@@ -53,7 +54,6 @@ async function performRefillMockData() {
   error.value = ''
   try {
     await adminApi.refillMockData()
-    // Immediate data refresh after successful refill
     const [categoriesData, productsData] = await Promise.all([
       fetch(`${API_BASE}/categories`).then(r => r.json()),
       fetch(`${API_BASE}/products`).then(r => r.json())
@@ -84,10 +84,8 @@ async function performClearAllData() {
   error.value = ''
   try {
     await adminApi.clearAllData()
-    // Immediately clear local data after successful API call
     categories.value = []
     products.value = []
-    // Then refresh from server to ensure consistency
     const [categoriesData, productsData] = await Promise.all([
       fetch(`${API_BASE}/categories`).then(r => r.json()),
       fetch(`${API_BASE}/products`).then(r => r.json())
@@ -102,7 +100,7 @@ async function performClearAllData() {
   }
 }
 
-// Load data
+// Data load
 async function loadData() {
   loading.value = true
   error.value = ''
@@ -120,10 +118,9 @@ async function loadData() {
     loading.value = false
   }
 }
-
 onMounted(loadData)
 
-// Category CRUD
+// --- CRUD handlers, adapted for category-grouped view ---
 async function handleCategorySubmit(data: { name: string }) {
   submitting.value = true
   try {
@@ -160,7 +157,13 @@ async function deleteCategory(category: Category) {
   showConfirmDialog.value = true
 }
 
-// Product CRUD
+// Open modal for add/edit category
+function openCategoryModal(category?: Category) {
+  editingCategory.value = category || null
+  showCategoryModal.value = true
+}
+
+// --- PRODUCT handlers for grouped admin UI ---
 async function handleProductSubmit(data: { name: string; category_id: number; image_url: string; quantity: number }) {
   submitting.value = true
   try {
@@ -177,10 +180,12 @@ async function handleProductSubmit(data: { name: string; category_id: number; im
   } finally {
     submitting.value = false
     editingProduct.value = null
+    pendingProductCategoryId.value = null
   }
 }
 
 async function deleteProduct(product: Product) {
+  // unused 'category' removed to fix lint errors
   confirmDialogConfig.value = {
     title: 'Delete Product',
     message: `Are you sure you want to delete the product "${product.name}"? This cannot be undone.`,
@@ -197,13 +202,14 @@ async function deleteProduct(product: Product) {
   showConfirmDialog.value = true
 }
 
-function openCategoryModal(category?: Category) {
-  editingCategory.value = category || null
-  showCategoryModal.value = true
-}
-
-function openProductModal(product?: Product) {
+// In grouped UI, allow both generic product modal and group-specific "add to this category"
+function openProductModal(product?: Product | null, categoryId?: number) {
   editingProduct.value = product || null
+  if (typeof categoryId === 'number') {
+    pendingProductCategoryId.value = categoryId
+  } else {
+    pendingProductCategoryId.value = null
+  }
   showProductModal.value = true
 }
 </script>
@@ -237,101 +243,32 @@ function openProductModal(product?: Product) {
 
     <div v-if="loading" class="loading">Loading...</div>
     <ErrorAlert v-else-if="error" :message="error" />
-    
-    <template v-else>
-      <!-- Categories Section -->
-      <section class="dashboard-section">
-        <div class="section-header">
-          <h2>Categories</h2>
-          <button @click="openCategoryModal()" class="add-btn">
-            Add Category
-          </button>
-        </div>
-        
-        <div class="table-container">
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="category in categories" :key="category.id">
-                <td>{{ category.id }}</td>
-                <td>{{ category.name }}</td>
-                <td>
-                  <button
-                    @click="openCategoryModal(category)"
-                    class="action-btn edit"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    @click="deleteCategory(category)"
-                    class="action-btn delete"
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <div v-if="categories.length === 0" class="empty-state">
-            <p>No categories yet! Use the "Add Category" button above to create categories.</p>
-          </div>
-        </div>
-      </section>
 
-      <!-- Products Section -->
+    <template v-else>
+      <!-- Card-based grouped admin UI -->
       <section class="dashboard-section">
         <div class="section-header">
-          <h2>Products</h2>
-          <button @click="openProductModal()" class="add-btn">
-            Add Product
+          <h2>Categories & Products</h2>
+          <button @click="openCategoryModal()" class="add-btn" title="Add category" aria-label="Add category">
+            ➕ Add Category
           </button>
         </div>
         
-        <div class="table-container">
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Category</th>
-                <th>Quantity</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="product in products" :key="product.id">
-                <td>{{ product.id }}</td>
-                <td>{{ product.name }}</td>
-                <td>
-                  {{ categories.find(c => c.id === product.category_id)?.name }}
-                </td>
-                <td>{{ product.quantity }}</td>
-                <td>
-                  <button
-                    @click="openProductModal(product)"
-                    class="action-btn edit"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    @click="deleteProduct(product)"
-                    class="action-btn delete"
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <div v-if="products.length === 0" class="empty-state">
-            <p>No products yet! Use the "Add Product" button above to create products, or use "Refill Mock Data" to add sample items.</p>
-          </div>
+        <div v-if="categories.length === 0" class="empty-state">
+          <p>No categories yet! Use the ➕ button above to create categories.</p>
+        </div>
+        <div v-else>
+          <AdminCategoryBlock
+            v-for="cat in categories"
+            :key="cat.id"
+            :category="cat"
+            :products="products.filter(prod => prod.category_id === cat.id)"
+            @add-product="(catId) => openProductModal(null, catId)" 
+            @edit-category="openCategoryModal"
+            @delete-category="deleteCategory"
+            @edit-product="(product, category) => openProductModal(product, category.id)"
+            @delete-product="deleteProduct"
+          />
         </div>
       </section>
     </template>
@@ -384,13 +321,12 @@ function openProductModal(product?: Product) {
   max-width: 1200px;
   margin: 0 auto;
 }
-
 .loading {
   text-align: center;
   padding: 2rem;
   color: var(--text-muted);
 }
-
+/* Card/block layout update overrides */
 .dashboard-section {
   background: white;
   border-radius: var(--card-radius);
@@ -398,77 +334,54 @@ function openProductModal(product?: Product) {
   margin-bottom: 2rem;
   box-shadow: var(--card-shadow);
 }
-
 .section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.35rem;
 }
-
 .section-header h2 {
   margin: 0;
   color: var(--primary);
 }
-
 .add-btn {
   background: var(--primary);
   color: white;
   border: none;
-  padding: 0.5rem 1rem;
+  padding: 0.51rem 1.01rem;
   border-radius: 8px;
   cursor: pointer;
-}
-
-.table-container {
-  overflow-x: auto;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 1rem;
-}
-
-th, td {
-  padding: 0.75rem;
-  text-align: left;
-  border-bottom: 1px solid #eee;
-}
-
-th {
-  background: #f8f9fa;
-  color: var(--text-muted);
+  font-size: 1.13rem;
   font-weight: 600;
+  letter-spacing: 0.02em;
+  display: flex;
+  align-items: center;
+  gap: 0.3em;
+  transition: background 0.14s, color 0.1s;
 }
-
-.action-btn {
-  padding: 0.3rem 0.8rem;
-  margin: 0 0.2rem;
-  border-radius: 4px;
-  border: none;
-  cursor: pointer;
+.add-btn:hover, .add-btn:focus-visible {
+  background: var(--accent);
+  color: var(--primary);
 }
-
-.action-btn.edit {
-  background: var(--primary);
-  color: white;
-}
-
-.action-btn.delete {
-  background: var(--danger);
-  color: white;
+.empty-state {
+  text-align: center;
+  padding: 2rem 1rem;
+  border-radius: 15px;
+  background: #fffbe3;
+  margin: 1rem auto;
+  width: 100%;
+  border: 2px dashed var(--accent);
+  color: var(--text-muted);
+  font-size: 1.1em;
 }
 
 .data-management {
   margin-bottom: 2rem;
 }
-
 .data-actions {
   display: flex;
   gap: 1rem;
 }
-
 .data-btn {
   padding: 0.6rem 1.2rem;
   border-radius: 8px;
@@ -477,22 +390,18 @@ th {
   font-weight: 600;
   transition: all 0.2s ease;
 }
-
 .data-btn.refill {
   background: var(--accent);
   color: var(--primary);
 }
-
 .data-btn.clear {
   background: var(--danger);
   color: white;
 }
-
 .data-btn:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
-
 .data-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
@@ -502,20 +411,13 @@ th {
   .admin-dashboard {
     padding: 1rem;
   }
-  
-  .action-btn {
-    padding: 0.2rem 0.5rem;
-    font-size: 0.9rem;
+  .add-btn {
+    padding: 0.33rem 0.6rem;
+    font-size: 1rem;
   }
-
   .data-actions {
     flex-direction: column;
     gap: 0.5rem;
-  }
-
-  .data-btn {
-    width: 100%;
-    padding: 0.5rem 1rem;
   }
 }
 </style>
