@@ -1,12 +1,10 @@
 <script setup lang="ts">
-import { RouterView, useRouter, useRoute } from 'vue-router'
+import { RouterView, useRouter } from 'vue-router'
 import { useAuthStore } from './stores/auth'
 import { computed } from 'vue'
-import AdminNavButton from './components/AdminNavButton.vue'
 
 const auth = useAuthStore()
 const router = useRouter()
-const route = useRoute()
 const isAdmin = computed(() => auth.isAdmin)
 
 function handleLogout() {
@@ -17,17 +15,20 @@ function handleLogout() {
 function goToLogin() {
   router.push({ name: 'admin-login' })
 }
-
-// Don't show floating nav button on login page (no admin dashboard page yet)
-const showAdminNavButton = computed(() =>
-  route.name !== 'admin-login'
-)
 </script>
 
 <template>
   <header class="app-header">
     <h1>Stock Management System</h1>
     <nav class="app-nav">
+      <!-- Manage Stock: visible only to admins -->
+      <button
+        v-if="isAdmin"
+        @click="()=>router.push({name:'admin-dashboard'})"
+        class="admin-btn manage-stock-btn"
+      >
+        ⚙️ Manage Stock
+      </button>
       <button v-if="isAdmin" @click="handleLogout" class="admin-btn logout-btn">
         Logout (Admin)
       </button>
@@ -36,7 +37,6 @@ const showAdminNavButton = computed(() =>
       </button>
     </nav>
   </header>
-  <AdminNavButton v-if="showAdminNavButton" />
   <RouterView />
 </template>
 
@@ -67,6 +67,7 @@ const showAdminNavButton = computed(() =>
   gap: 1.1em;
 }
 
+/* General flat admin button style */
 .admin-btn {
   border-radius: 8px;
   font-size: 1em;
@@ -76,13 +77,31 @@ const showAdminNavButton = computed(() =>
   padding: 0.42em 1.4em;
   margin-left: 1em;
   border: 2px solid var(--primary);
-  background: linear-gradient(to right, var(--primary) 77%, var(--accent) 120%);
-  box-shadow: 0 2px 16px #3498db12;
-  transition: background 0.17s, border 0.17s;
+  background: var(--primary); /* flat */
+  box-shadow: 0 2px 12px #3498db13;
+  transition: background 0.17s, border 0.17s, color 0.15s;
   cursor: pointer;
+  min-width: 138px;
 }
+
+/* Flat blue for Manage, blue-to-accent on hover */
+.manage-stock-btn {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #fff;
+  min-width: 146px;
+}
+.manage-stock-btn:hover,
+.manage-stock-btn:focus {
+  background: var(--accent);
+  color: var(--primary);
+  border-color: var(--accent);
+  outline: 0;
+}
+
+/* Login = blue, Logout = red, same sizing/shape */
 .login-btn {
-  background: linear-gradient(90deg, var(--primary), #1d5da5 90%);
+  background: var(--primary);
   color: #fff;
   border-color: var(--primary);
 }
@@ -91,10 +110,29 @@ const showAdminNavButton = computed(() =>
   color: #fff;
   border-color: var(--danger);
 }
+.logout-btn:hover,
+.logout-btn:focus {
+  background: #fff;
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+/* Consistent hover/focus for all header admin buttons */
 .admin-btn:hover,
 .admin-btn:focus {
   background: var(--accent);
   color: var(--primary);
   border-color: var(--accent);
+}
+
+@media (max-width: 700px) {
+  .app-header h1 {
+    font-size: 1.19rem;
+  }
+  .app-nav {
+    right: 1vw;
+    gap: .62em;
+    top: 1.1rem;
+  }
 }
 </style>
