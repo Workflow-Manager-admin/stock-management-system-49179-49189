@@ -18,12 +18,17 @@ const isOnAdminDashboard = computed(() => route.name === 'admin-dashboard')
  * - On main/public view: show "Manage Stock", nav to dashboard.
  * - On admin dashboard: show "Back to Public View", nav to home.
  */
-const adminHeaderButton = computed(() => {
-  if (!isAdmin.value) return null
+interface HeaderButton {
+  label: string;
+  action: (event: Event) => void;
+}
+
+const adminHeaderButton = computed<HeaderButton | null>(() => {
+  if (!isAdmin.value) return null;
   return isOnAdminDashboard.value
     ? { label: '← Back to Public View', action: goToPublic }
-    : { label: '⚙️ Manage Stock', action: goToDashboard }
-})
+    : { label: '⚙️ Manage Stock', action: goToDashboard };
+});
 
 function handleLogout() {
   auth.logout()
@@ -32,11 +37,18 @@ function handleLogout() {
 function goToLogin() {
   router.push({ name: 'admin-login' })
 }
-function goToDashboard() {
-  if (!isOnAdminDashboard.value) router.push({ name: 'admin-dashboard' })
+function goToDashboard(event: Event) {
+  if (!isOnAdminDashboard.value) {
+    // Blur the button to remove focus state
+    (event.target as HTMLElement)?.blur?.();
+    router.push({ name: 'admin-dashboard' });
+  }
 }
-function goToPublic() {
-  if (isOnAdminDashboard.value) router.push({ name: 'home' })
+function goToPublic(event: Event) {
+  if (isOnAdminDashboard.value) {
+    (event.target as HTMLElement)?.blur?.();
+    router.push({ name: 'home' });
+  }
 }
 </script>
 
@@ -49,7 +61,7 @@ function goToPublic() {
           v-if="adminHeaderButton"
           class="admin-btn manage-stock-btn"
           style="min-width:125px;"
-          @click="adminHeaderButton.action"
+          @click="(e) => adminHeaderButton?.action?.(e)"
         >
           {{ adminHeaderButton.label }}
         </button>

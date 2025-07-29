@@ -66,7 +66,7 @@ async function handleLogin() {
 </template>
 
 <style scoped>
-/* Outer flex for vertical shift above center */
+/* Perfect centering with flexbox */
 .admin-login-outer {
   height: 100vh;
   min-height: 100vh;
@@ -74,19 +74,22 @@ async function handleLogin() {
   min-width: 100vw;
   background: var(--background, #f7fafd);
   display: flex;
-  align-items: flex-start; /* Align items to top, then use margin-top to push down */
+  align-items: center;
   justify-content: center;
+  margin: 0;
+  padding: 0;
+  position: fixed;
+  top: 0;
+  left: 0;
 }
 
 .admin-login-center {
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
-  /* Move login box down to just above center: top 40% visually balanced */
-  margin-top: 7vh; /* ~40% down in viewport, adjusted for box height */
-  /* Provide responsive margin for small screens later */
+  /* Slight upward shift for visual balance */
+  transform: translateY(-3%);
 }
 /* The card itself */
 .admin-login-card {
