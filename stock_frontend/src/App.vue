@@ -65,32 +65,36 @@ function goToLogin() {
   position: relative;
 }
 
-/* Header zone layouts */
-.header-left, .header-right {
-  flex: 1 1 0;
+.header-left,
+.header-right {
   display: flex;
   align-items: center;
-  min-width: 155px; /* matches button minimum */
+  min-width: 0;
 }
+
 .header-left {
+  flex: 0 0 auto;
   justify-content: flex-start;
-  /* visually aligns with padding on title area */
   padding-left: 2vw;
+  /* Give only as much space as needed */
 }
+
 .header-right {
+  flex: 0 0 auto;
   justify-content: flex-end;
   padding-right: 2vw;
   gap: 1em;
+  /* Only takes enough width for its content */
 }
+
 .header-title {
-  flex: 0 1 auto;
+  flex: 1 1 0%;
   display: flex;
   justify-content: center;
   align-items: center;
   min-width: 0;
 }
 
-/* Heading: always center, never overlapped */
 .header-title h1 {
   font-family: inherit;
   color: var(--primary);
@@ -99,170 +103,107 @@ function goToLogin() {
   letter-spacing: 0.02em;
   margin: 0;
   text-shadow: none;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 430px;
-  width: 100%;
+  /* CENTERED, fully visible, no ellipsis/truncation */
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
+  max-width: none;
+  width: auto;
   text-align: center;
   transition: font-size 0.2s;
+  line-height: 1.1;
+  /* allow wrapping on mobile if needed but prioritize centering/visibility */
 }
 
-/* Responsive for header */
+.admin-btn {
+  border-radius: 8px;
+  font-size: 1em;
+  font-family: inherit;
+  color: #fff;
+  font-weight: 700;
+  padding: 0.42em 1.4em;
+  margin-left: 1em;
+  border: 2px solid var(--primary);
+  background: var(--primary);
+  box-shadow: 0 2px 12px #3498db13;
+  transition: background 0.17s, border 0.17s, color 0.15s;
+  cursor: pointer;
+  min-width: 118px;
+  /* Decrease min-width so buttons only reserve space they need, prevents squeezing of title */
+}
+
+.manage-stock-btn {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #fff;
+  min-width: 125px;
+  margin-left: 0;
+}
+.manage-stock-btn:hover,
+.manage-stock-btn:focus {
+  background: var(--accent);
+  color: var(--primary);
+  border-color: var(--accent);
+  outline: 0;
+}
+
+.login-btn {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+.logout-btn {
+  background: var(--danger);
+  color: #fff;
+  border-color: var(--danger);
+}
+.logout-btn:hover,
+.logout-btn:focus {
+  background: #fff;
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+.admin-btn:hover,
+.admin-btn:focus {
+  background: var(--accent);
+  color: var(--primary);
+  border-color: var(--accent);
+}
+
 @media (max-width: 700px) {
-  .header-title h1 {
-    font-size: 1.19rem;
-    max-width: 162px;
-  }
-  .header-left,
-  .header-right {
-    min-width: 86px;
-    padding: 0 0.16em;
-  }
   .header-flex {
     padding: 0 6px;
     min-width: 0;
   }
-}
-
-/* Old .app-nav (removed) */
-
-/* General flat admin button style */
-.admin-btn {
-  border-radius: 8px;
-  font-size: 1em;
-  font-family: inherit;
-  color: #fff;
-  font-weight: 700;
-  padding: 0.42em 1.4em;
-  margin-left: 1em;
-  border: 2px solid var(--primary);
-  background: var(--primary); /* flat */
-  box-shadow: 0 2px 12px #3498db13;
-  transition: background 0.17s, border 0.17s, color 0.15s;
-  cursor: pointer;
-  min-width: 138px;
-}
-
-/* Flat blue for Manage, blue-to-accent on hover */
-.manage-stock-btn {
-  border-color: var(--primary);
-  background: var(--primary);
-  color: #fff;
-  min-width: 146px;
-  margin-left: 0; /* leftmost */
-}
-.manage-stock-btn:hover,
-.manage-stock-btn:focus {
-  background: var(--accent);
-  color: var(--primary);
-  border-color: var(--accent);
-  outline: 0;
-}
-
-/* Login = blue, Logout = red, same sizing/shape */
-.login-btn {
-  background: var(--primary);
-  color: #fff;
-  border-color: var(--primary);
-}
-.logout-btn {
-  background: var(--danger);
-  color: #fff;
-  border-color: var(--danger);
-}
-.logout-btn:hover,
-.logout-btn:focus {
-  background: #fff;
-  color: var(--danger);
-  border-color: var(--danger);
-}
-
-/* Consistent hover/focus for all header admin buttons */
-.admin-btn:hover,
-.admin-btn:focus {
-  background: var(--accent);
-  color: var(--primary);
-  border-color: var(--accent);
-}
-
-@media (max-width: 700px) {
+  .header-title h1 {
+    font-size: 1.12rem;
+    /* Allow wrapping if space is too tight, prefer 2 lines than truncation */
+    white-space: normal;
+    max-width: 98vw;
+    min-width: 0;
+    overflow: visible;
+    text-overflow: unset;
+    word-break: break-word;
+    line-height: 1.13;
+    padding: 0 6vw;
+  }
+  .header-left,
+  .header-right {
+    min-width: 54px;
+    max-width: 33vw;
+    padding: 0 0.16em;
+    flex: 0 0 auto;
+  }
   .admin-btn {
-    font-size: 0.92em;
-    min-width: 98px;
-    padding: 0.36em 0.7em;
-    margin-left: .33em;
+    font-size: 0.87em;
+    min-width: 78px;
+    padding: 0.33em 0.67em;
+    margin-left: .23em;
   }
   .manage-stock-btn {
-    min-width: 106px;
+    min-width: 87px;
   }
 }
-/* General flat admin button style */
-.admin-btn {
-  border-radius: 8px;
-  font-size: 1em;
-  font-family: inherit;
-  color: #fff;
-  font-weight: 700;
-  padding: 0.42em 1.4em;
-  margin-left: 1em;
-  border: 2px solid var(--primary);
-  background: var(--primary); /* flat */
-  box-shadow: 0 2px 12px #3498db13;
-  transition: background 0.17s, border 0.17s, color 0.15s;
-  cursor: pointer;
-  min-width: 138px;
-}
 
-/* Flat blue for Manage, blue-to-accent on hover */
-.manage-stock-btn {
-  border-color: var(--primary);
-  background: var(--primary);
-  color: #fff;
-  min-width: 146px;
-}
-.manage-stock-btn:hover,
-.manage-stock-btn:focus {
-  background: var(--accent);
-  color: var(--primary);
-  border-color: var(--accent);
-  outline: 0;
-}
-
-/* Login = blue, Logout = red, same sizing/shape */
-.login-btn {
-  background: var(--primary);
-  color: #fff;
-  border-color: var(--primary);
-}
-.logout-btn {
-  background: var(--danger);
-  color: #fff;
-  border-color: var(--danger);
-}
-.logout-btn:hover,
-.logout-btn:focus {
-  background: #fff;
-  color: var(--danger);
-  border-color: var(--danger);
-}
-
-/* Consistent hover/focus for all header admin buttons */
-.admin-btn:hover,
-.admin-btn:focus {
-  background: var(--accent);
-  color: var(--primary);
-  border-color: var(--accent);
-}
-
-@media (max-width: 700px) {
-  .app-header h1 {
-    font-size: 1.19rem;
-  }
-  .app-nav {
-    right: 1vw;
-    gap: .62em;
-    top: 1.1rem;
-  }
-}
 </style>
