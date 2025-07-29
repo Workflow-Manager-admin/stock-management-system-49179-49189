@@ -67,7 +67,7 @@ Break down `HomeView.vue` into reusable, maintainable components without changin
     - Passes all necessary data and functions to child.
 
 3. **Maintain All UI/UX**
-    - Carefully preserve all current classes and structure (cat-title, cat-divider, error-box, product-list, etc.)
+    - Carefully preserve all current classes and structure (cat-title, cat-divider, error-box, product-list, no-products, etc.)
     - Keep logic for selected/highlighted category, scroll-into-view, etc.
 
 ---
