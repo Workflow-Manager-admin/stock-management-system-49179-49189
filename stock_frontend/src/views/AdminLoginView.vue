@@ -3,6 +3,10 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
 
+import FormGroup from '../components/ui/FormGroup.vue';
+import PrimaryButton from '../components/ui/PrimaryButton.vue';
+import ErrorAlert from '../components/ui/ErrorAlert.vue';
+
 // PUBLIC_INTERFACE
 /**
  * AdminLoginView: provides a form for admin login (username, password).
@@ -32,19 +36,29 @@ async function handleLogin() {
       <section class="admin-login-card">
         <h2>Admin Login</h2>
         <form @submit.prevent="handleLogin" autocomplete="on">
-          <div class="login-field-row">
-            <label for="username">Admin Username</label>
-            <input type="text" id="username" v-model="username" required autocomplete="username" />
-          </div>
-          <div class="login-field-row">
-            <label for="password">Admin Password</label>
-            <input type="password" id="password" v-model="password" required autocomplete="current-password" />
-          </div>
-          <button type="submit" :disabled="submitting">
+          <FormGroup label="Admin Username" for-id="username">
+            <input
+              type="text"
+              id="username"
+              v-model="username"
+              required
+              autocomplete="username"
+            />
+          </FormGroup>
+          <FormGroup label="Admin Password" for-id="password">
+            <input
+              type="password"
+              id="password"
+              v-model="password"
+              required
+              autocomplete="current-password"
+            />
+          </FormGroup>
+          <PrimaryButton type="submit" :disabled="submitting">
             <span v-if="submitting">Logging In...</span>
             <span v-else>Login</span>
-          </button>
-          <div v-if="auth.loginError" class="login-error">{{ auth.loginError }}</div>
+          </PrimaryButton>
+          <ErrorAlert v-if="auth.loginError" :message="auth.loginError" />
         </form>
       </section>
     </main>
@@ -108,91 +122,7 @@ form {
   gap: 1.1em;
 }
 
-.login-field-row {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  width: 100%;
-  margin-bottom: 0.7em;
-}
-
-label {
-  font-family: inherit;
-  font-weight: 600;
-  color: var(--text-muted, #646e7a);
-  margin-bottom: 0.39em;
-  font-size: 1.08em;
-  letter-spacing: 0.02em;
-}
-
-input[type="text"],
-input[type="password"] {
-  width: 100%;
-  font-size: 1.15em;
-  font-family: inherit;
-  font-weight: 500;
-  color: var(--text-main, #25304a);
-  background: #f7fafd;
-  border: 1.7px solid #dde7f2;
-  border-radius: 9px;
-  padding: 0.64em 1.12em;
-  outline: none;
-  transition: border 0.18s, box-shadow 0.17s;
-  letter-spacing: 0.01em;
-  box-sizing: border-box;
-  line-height: 1.7;
-}
-input[type="text"]:focus,
-input[type="password"]:focus {
-  border-color: var(--primary, #3498db);
-  box-shadow: 0 2.5px 14px #3a98cd1d;
-}
-
-button[type="submit"] {
-  width: 100%;
-  margin-top: 0.21em;
-  padding: 0.82em 0.5em;
-  font-size: 1.12em;
-  font-family: inherit;
-  font-weight: 700;
-  border: none;
-  border-radius: 10px;
-  background: var(--primary, #3498db); /* FLAT, single color */
-  color: #fff;
-  box-shadow: 0 2px 11px #3699e019;
-  transition: background 0.13s, box-shadow 0.13s, color 0.13s;
-  letter-spacing: 0.01em;
-  cursor: pointer;
-  outline: none;
-}
-button[type="submit"]:hover:not(:disabled),
-button[type="submit"]:focus-visible:not(:disabled) {
-  background: var(--accent, #f1c40f);
-  color: var(--primary, #3498db);
-  outline: 2px solid var(--primary, #3498db);
-}
-
-/* Disabled state */
-button[type="submit"]:disabled {
-  opacity: 0.67;
-  cursor: not-allowed;
-  background: #b5c5d888;
-  color: #ffffffb0;
-}
-/* Error message styling */
-.login-error {
-  margin-top: 1.1em;
-  color: var(--danger, #ef5350);
-  background: #fff3f4;
-  border: 1.7px solid var(--danger, #ef5350);
-  border-radius: 10px;
-  padding: 0.77em 1.13em;
-  text-align: center;
-  font-weight: 700;
-  font-size: 1.037em;
-  letter-spacing: 0.03em;
-  min-width: 70%;
-}
+/* (removed .login-field-row, .login-error, and button[type="submit"] styles as replaced by reusable components) */
 @media (max-width: 600px) {
   .admin-login-center {
     margin-top: 3vh; /* Less margin on small screens */
