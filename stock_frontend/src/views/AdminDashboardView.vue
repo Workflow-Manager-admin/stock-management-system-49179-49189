@@ -19,6 +19,39 @@ const editingCategory = ref<Category | null>(null)
 const editingProduct = ref<Product | null>(null)
 const submitting = ref(false)
 
+// Data management
+async function handleRefillMockData() {
+  if (!confirm('Refill with mock data? This will reset all current data.')) return
+  
+  loading.value = true
+  error.value = ''
+  try {
+    await adminApi.refillMockData()
+    await loadData()
+  } catch (err) {
+    console.error('Refill mock data error:', err)
+    error.value = 'Failed to refill mock data. Please try again.'
+  } finally {
+    loading.value = false
+  }
+}
+
+async function handleClearAllData() {
+  if (!confirm('Clear all data? This cannot be undone!')) return
+  
+  loading.value = true
+  error.value = ''
+  try {
+    await adminApi.clearAllData()
+    await loadData()
+  } catch (err) {
+    console.error('Clear data error:', err)
+    error.value = 'Failed to clear data. Please try again.'
+  } finally {
+    loading.value = false
+  }
+}
+
 // Load data
 async function loadData() {
   loading.value = true
@@ -117,6 +150,29 @@ function openProductModal(product?: Product) {
 
 <template>
   <div class="admin-dashboard">
+    <!-- Data Management Section -->
+    <section class="dashboard-section data-management">
+      <div class="section-header">
+        <h2>Data Management</h2>
+        <div class="data-actions">
+          <button 
+            @click="handleRefillMockData" 
+            class="data-btn refill"
+            :disabled="loading"
+          >
+            🔄 Refill Mock Data
+          </button>
+          <button 
+            @click="handleClearAllData" 
+            class="data-btn clear"
+            :disabled="loading"
+          >
+            🗑️ Clear All Data
+          </button>
+        </div>
+      </div>
+    </section>
+
     <div v-if="loading" class="loading">Loading...</div>
     <ErrorAlert v-else-if="error" :message="error" />
     
@@ -324,6 +380,44 @@ th {
   color: white;
 }
 
+.data-management {
+  margin-bottom: 2rem;
+}
+
+.data-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.data-btn {
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.data-btn.refill {
+  background: var(--accent);
+  color: var(--primary);
+}
+
+.data-btn.clear {
+  background: var(--danger);
+  color: white;
+}
+
+.data-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.data-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 @media (max-width: 768px) {
   .admin-dashboard {
     padding: 1rem;
@@ -332,6 +426,16 @@ th {
   .action-btn {
     padding: 0.2rem 0.5rem;
     font-size: 0.9rem;
+  }
+
+  .data-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .data-btn {
+    width: 100%;
+    padding: 0.5rem 1rem;
   }
 }
 </style>

@@ -110,4 +110,17 @@ export const adminApi = {
       method: 'DELETE',
     })
   },
+
+  // Data Management
+  async refillMockData(): Promise<void> {
+    return this.request('/admin/refill-mocks', {
+      method: 'POST',
+    })
+  },
+
+  async clearAllData(): Promise<void> {
+    return this.request('/admin/clear-data', {
+      method: 'DELETE',
+    })
+  },
 }
